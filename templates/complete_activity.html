@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Atendimento - {{ activity.title }}{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main id="main-content" class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Registrar atendimento: {{ activity.title }}</h1>
+                <p>Preencha os dados do atendimento para hoje. Você já registrou <strong>{{ today_count }}</strong> vez(es) esta atividade hoje.</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="attendance_type">Tipo de atendimento</label>
+                    <select id="attendance_type" name="attendance_type" class="control">
+                        <option value="">--</option>
+                        {% if report_metrics %}
+                            {% for r in report_metrics %}
+                                {% if r == 'outro' and report_metrics_custom %}
+                                    <option value="outro">Outro — {{ report_metrics_custom }}</option>
+                                {% else %}
+                                    <option value="{{ r }}">{{ r|capitalize }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <option value="pacientes">Pacientes</option>
+                            <option value="acompanhantes">Acompanhantes</option>
+                            <option value="colaboradores">Colaboradores</option>
+                            <option value="outro">Outro</option>
+                        {% endif %}
+                    </select>
+                    <input id="attendance_type_custom" name="attendance_type_custom" class="control" placeholder="Especifique outro tipo" style="margin-top:0.5rem; display:none;" />
+                </div>
+
+                <div class="form-group">
+                    <label for="unit_scope">Unidade onde atendeu</label>
+                    <select id="unit_scope" name="unit_scope" class="control">
+                        <option value="">--</option>
+                        <option value="UTI 1">UTI 1</option>
+                        <option value="UTI 2">UTI 2</option>
+                        <option value="UTI 3">UTI 3</option>
+                        <option value="UTI 4">UTI 4</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                    <input id="unit_scope_custom" name="unit_scope_custom" class="control" placeholder="Especifique a unidade" style="margin-top:0.5rem; display:none;" />
+                </div>
+
+                <div class="form-group">
+                    <label for="observations">Observações</label>
+                    <textarea id="observations" name="observations" class="control" rows="4" placeholder="Notas rápidas sobre o atendimento (opcional)"></textarea>
+                </div>
+
+                {% if activity.allow_multiple %}
+                <div class="form-group">
+                    <label for="count">Número de atendimentos realizados (hoje)</label>
+                    <input id="count" name="count" type="number" min="1" value="1" class="control" />
+                    <div class="muted-text" style="margin-top:0.35rem;">Você já registrou <strong>{{ today_count }}</strong> vez(es) hoje; ao salvar serão adicionadas as quantidades informadas.</div>
+                </div>
+                {% else %}
+                <div class="muted-text">Observe: esta atividade não permite marcações múltiplas por dia; o registro será contado como 1 ocorrência.</div>
+                {% endif %}
+
+                <div class="form-actions">
+                    <a href="{{ url_for('activities') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar registro</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const at = document.getElementById('attendance_type');
+    const atCustom = document.getElementById('attendance_type_custom');
+    if (at){
+        function toggleAtCustom(){
+            atCustom.style.display = (at.value === 'outro') ? 'block' : 'none';
+        }
+        at.addEventListener('change', toggleAtCustom);
+        toggleAtCustom();
+    }
+    const us = document.getElementById('unit_scope');
+    const usCustom = document.getElementById('unit_scope_custom');
+    if (us){
+        function toggleUsCustom(){ usCustom.style.display = (us.value === 'Outro') ? 'block' : 'none'; }
+        us.addEventListener('change', toggleUsCustom);
+        toggleUsCustom();
+    }
+});
+</script>
+{% endblock %}

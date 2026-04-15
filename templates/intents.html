@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Candidatos - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Candidatos</h1>
+                <p>Inscrições recebidas para avaliação de voluntariado</p>
+            </div>
+        </header>
+
+        <div class="table-container">
+            {% if intents %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>RG</th>
+                        <th>CPF</th>
+                        <th>Celular</th>
+                        <th>E-mail</th>
+                        <th>Endereço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in intents %}
+                    <tr data-intent-id="{{ i.idintencao }}"
+                        data-hospital="{{ i.hospital }}"
+                        data-nome="{{ i.nome }}"
+                        data-data_nascimento="{{ i.data_nascimento }}"
+                        data-local_nascimento="{{ i.local_nascimento }}"
+                        data-rg="{{ i.rg }}"
+                        data-cpf="{{ i.cpf }}"
+                        data-estado_civil="{{ i.estado_civil }}"
+                        data-nome_conjuge="{{ i.nome_conjuge }}"
+                        data-nome_pai="{{ i.nome_pai }}"
+                        data-nome_mae="{{ i.nome_mae }}"
+                        data-endereco="{{ i.endereco }}"
+                        data-telefone_residencial="{{ i.telefone_residencial }}"
+                        data-celular="{{ i.celular }}"
+                        data-religiao="{{ i.religiao }}"
+                        data-email="{{ i.email }}"
+                        data-escolaridade_curso="{{ i.escolaridade_curso }}"
+                        data-local_trabalho="{{ i.local_trabalho }}"
+                        data-telefone_trabalho="{{ i.telefone_trabalho }}"
+                        data-ocupacao="{{ i.ocupacao }}"
+                        data-ocupacao_outro="{{ i.ocupacao_outro }}"
+                        data-acomp_med="{{ i.acomp_med }}"
+                        data-transporte="{{ i.transporte }}"
+                        data-ficou_sab="{{ i.ficou_sab }}"
+                        data-ja_volunt="{{ i.ja_volunt }}"
+                        data-ja_volunt_onde="{{ i.ja_volunt_onde }}"
+                        data-faz_volunt="{{ i.faz_volunt }}"
+                        data-contrib_ser="{{ i.contrib_ser }}"
+                        data-hab_musical="{{ i.hab_musical }}"
+                        data-hab_musical_qual="{{ i.hab_musical_qual }}"
+                        data-aux_alimentacao="{{ i.aux_alimentacao }}"
+                        data-createdat="{{ i.createdAt }}">
+                        <td><strong>{{ i.nome }}</strong></td>
+                        <td class="muted-text">{{ i.rg }}</td>
+                        <td>{{ i.cpf }}</td>
+                        <td>{{ i.celular }}</td>
+                        <td>{{ i.email }}</td>
+                        <td>{{ i.endereco|truncate(60) }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="button" class="btn-small btn-secondary" onclick="openIntentModal('{{ i.idintencao }}')">Ver mais</button>
+                                <form method="POST" action="{{ url_for('approve_intent', intent_id=i.idintencao) }}" style="display:inline;">
+                                    <button type="submit" class="btn-small btn-primary">Aprovar</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('delete_intent', intent_id=i.idintencao) }}" style="display:inline;" onsubmit="return confirm('Remover inscrição?');">
+                                    <button type="submit" class="btn-small btn-danger">Remover</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state" style="padding:1.25rem;">
+                <p>Não há inscrições pendentes.</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<div id="intent-modal-backdrop" class="modal-backdrop" aria-hidden="true" style="display:none;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="intent-modal-title">
+        <header class="modal-header">
+            <h2 id="intent-modal-title">&nbsp;</h2>
+            <button class="modal-close" aria-label="Fechar" onclick="closeIntentModal()">×</button>
+        </header>
+        <div class="modal-body" id="intent-modal-body">
+            <!-- populated by centralized JS -->
+        </div>
+    </div>
+</div>
+{% endblock %}

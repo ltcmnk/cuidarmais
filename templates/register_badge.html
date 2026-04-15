@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Crachá - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Registrar Crachá</h1>
+                <p>Procure um voluntário, selecione da lista ou pesquise pelo nome/usuário e adicione o número do crachá</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="GET" action="{{ url_for('register_badge') }}" style="display:flex; gap:.5rem; margin-bottom:1rem;">
+                <input type="search" name="q" class="control" placeholder="Pesquisar por nome ou usuário" value="{{ q if q }}" style="flex:1;">
+                <button class="btn-primary">Pesquisar</button>
+            </form>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="user_id">Voluntário</label>
+                    <div style="display:flex; gap:0.5rem; flex-direction:column;">
+                        <input list="users-datalist-rb" id="rb_user_search" class="control" placeholder="Comece a digitar para filtrar e escolher" aria-label="Filtrar voluntários">
+                        <datalist id="users-datalist-rb">
+                            {% for u in users %}
+                            <option value="{{u.nome_completo if u.nome_completo is defined else (u.nome if u.nome is defined)}}{% if u.username %} ({{ u.username }}){% endif %}" data-id="{{ u.id }}"></option>
+                            {% endfor %}
+                        </datalist>
+                        <input type="hidden" id="user_id" name="user_id" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="codigo_cracha">Número do Crachá</label>
+                    <input id="codigo_cracha" name="codigo_cracha" required>
+                </div>
+                <div class="form-actions">
+                    <a href="{{ url_for('dashboard') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const search = document.getElementById('rb_user_search');
+    const datalist = document.getElementById('users-datalist-rb');
+    const hidden = document.getElementById('user_id');
+    if (!search || !datalist || !hidden) return;
+    search.addEventListener('input', function(){
+        const v = (search.value || '').trim();
+        let found = '';
+        // exact match first
+        Array.from(datalist.options).forEach(opt => {
+            if (opt.value === v && opt.dataset && opt.dataset.id) found = opt.dataset.id;
+        });
+        // if not exact, try substring
+        if (!found && v){
+            const low = v.toLowerCase();
+            const sub = Array.from(datalist.options).find(opt => (opt.value || '').toLowerCase().includes(low));
+            if (sub && sub.dataset) found = sub.dataset.id;
+        }
+        hidden.value = found || '';
+    });
+});
+</script>
+{% endblock %}

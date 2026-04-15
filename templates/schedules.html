@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Gestão de Escalas - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Escalas</h1>
+                <p>Gerencie escalas de voluntários e consulte horas trabalhadas nesta semana</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST" action="{{ url_for('users.add_schedule') }}" style="display:flex; gap:0.5rem; align-items:end; flex-wrap:wrap;">
+                <div style="flex:1; min-width:200px;">
+                    <label for="user_id">Voluntário</label>
+                    <select id="user_id" name="user_id" class="control" required>
+                        <option value="">-- escolha --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ (u.nome_completo or u.nome) }} ({{ u.username }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="day">Dia</label>
+                    <select id="day" name="day" class="control" required>
+                        <option value="seg">2ª feira</option>
+                        <option value="ter">3ª feira</option>
+                        <option value="qua">4ª feira</option>
+                        <option value="qui">5ª feira</option>
+                        <option value="sex">6ª feira</option>
+                        <option value="sab">Sábado</option>
+                        <option value="dom">Domingo</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="start">Início</label>
+                    <input id="start" name="start" type="time" class="control" required>
+                </div>
+                <div>
+                    <label for="end">Fim</label>
+                    <input id="end" name="end" type="time" class="control" required>
+                </div>
+                <div>
+                    <button type="submit" class="btn-primary">Adicionar escala</button>
+                </div>
+            </form>
+        </div>
+
+        <section style="margin-top:1rem;">
+            <h3>Escalas existentes</h3>
+            {% if schedules %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Voluntário</th>
+                            <th>Dia</th>
+                            <th>Início</th>
+                            <th>Fim</th>
+                            <th>Horas esta semana</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in schedules %}
+                        {% set user = (users | selectattr('id','equalto', s.userId) | list).0 %}
+                        <tr>
+                            <td>{{ user.nome_completo if user else ('Desconhecido') }}</td>
+                            <td>{{ s.day }}</td>
+                            <td>{{ s.start }}</td>
+                            <td>{{ s.end }}</td>
+                            <td>
+                                {% if user %}
+                                    {% set secs = week_map.get(user.id|string, 0) %}
+                                    {% set hrs = (secs // 3600) %}
+                                    {% set mins = ((secs % 3600) // 60) %}
+                                    {{ hrs }}h {{ mins }}m
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('users.delete_schedule', sched_id=s.id) }}" onsubmit="return confirm('Remover escala?');" style="display:inline;">
+                                    <button type="submit" class="btn-small btn-danger">Remover</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">Nenhuma escala cadastrada.</div>
+            {% endif %}
+        </section>
+    </main>
+</div>
+{% endblock %}

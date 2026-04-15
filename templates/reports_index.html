@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Relatórios</h1>
+                <p>Exportar presenças ou horas trabalhadas em CSV ou XLSX</p>
+            </div>
+        </header>
+
+        <div class="top-cards">
+            <datalist id="users-datalist">
+                <option value="">— Todos —</option>
+                {% for u in users %}
+                <option value="{{ u.nome_completo if u.nome_completo is defined else (u.nome if u.nome is defined) }}{{ u.username }}" data-id="{{ u.id }}" data-cpf="{{ u.cpf if u.cpf else '' }}">{{ u.nome_completo if u.nome_completo is defined else (u.nome if u.nome is defined) }} ({{ u.username }})</option>
+                {% endfor %}
+            </datalist>
+            <!-- per-activity user datalist (populated by JS) -->
+            <datalist id="activity-users-datalist"></datalist>
+            <!-- Presences card -->
+            <div class="form-container wide">
+                <h3>Presenças</h3>
+                <form id="form-presences" method="GET" action="{{ url_for('clock_entries') }}" style="display:flex; flex-direction:column; gap:0.75rem;">
+                    <div class="card-row">
+                        <input list="users-datalist" id="user-search-presences" class="control" placeholder="Comece a digitar para filtrar usuários">
+                        <input type="hidden" name="user_id" id="user-id-presences" value="">
+                        <input type="hidden" name="report" value="csv">
+                    </div>
+
+                    <div class="card-row date-row" style="align-items:center;">
+                        <label style="display:flex; gap:0.5rem; align-items:center;">Início <input type="date" name="start_date" class="control"></label>
+                        <label style="display:flex; gap:0.5rem; align-items:center;">Fim <input type="date" name="end_date" class="control"></label>
+                    </div>
+                    <div class="card-actions">
+                        <div class="export-dropdown">
+                            <button type="button" class="btn-primary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>
+                            <div class="export-menu" role="menu" aria-hidden="true">
+                                <button type="button" class="export-item" data-format="csv" data-form-id="form-activity-report">CSV</button>
+                                <button type="button" class="export-item" data-format="xlsx" data-form-id="form-activity-report">XLSX</button>
+                            </div>
+                        </div>
+                        <div class="export-dropdown export-todos">
+                            <button type="button" class="btn-secondary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar todos ▾</button>
+                            <div class="export-menu" role="menu" aria-hidden="true">
+                                <button type="button" class="export-item" data-format="csv" data-form-id="form-activity-report" data-clear-user="1">CSV</button>
+                                <button type="button" class="export-item" data-format="xlsx" data-form-id="form-activity-report" data-clear-user="1">XLSX</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Hours card -->
+            <div class="form-container wide">
+                <h3>Horas Trabalhadas</h3>
+                <form id="form-hours" method="GET" action="{{ url_for('report_hours') }}" style="display:flex; flex-direction:column; gap:0.75rem;">
+                    <div class="card-row date-row">
+                        <input list="users-datalist" id="user-search-hours" class="control" placeholder="Comece a digitar para filtrar usuários">
+                        <input type="hidden" name="user_id" id="user-id-hours" value="">
+                    </div>
+
+                    <div class="card-row date-row">
+                        <label style="display:flex; gap:0.5rem; align-items:center;">Início <input type="date" name="start_date" class="control"></label>
+                        <label style="display:flex; gap:0.5rem; align-items:center;">Fim <input type="date" name="end_date" class="control"></label>
+                        <div>
+                            <input type="hidden" name="user_id" id="user-id-hours-bottom" value="">
+                        </div>
+                    </div>
+
+                        <div class="card-actions">
+                            <div class="export-dropdown">
+                                <button type="button" class="btn-primary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>
+                                <div class="export-menu" role="menu" aria-hidden="true">
+                                    <button type="button" class="export-item" data-format="csv" data-form-id="form-hours">CSV</button>
+                                    <button type="button" class="export-item" data-format="xlsx" data-form-id="form-hours">XLSX</button>
+                                </div>
+                            </div>
+                            <div class="export-dropdown export-todos">
+                                <button type="button" class="btn-secondary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar todos ▾</button>
+                                <div class="export-menu" role="menu" aria-hidden="true">
+                                    <button type="button" class="export-item" data-format="csv" data-form-id="form-hours" data-clear-user="1">CSV</button>
+                                    <button type="button" class="export-item" data-format="xlsx" data-form-id="form-hours" data-clear-user="1">XLSX</button>
+                                </div>
+                            </div>
+                        </div>
+                </form>
+            </div>
+
+            <!-- Activity report card (moved below the others) -->
+            <div class="form-container wide activity-report">
+                <h3>Relatório por Atividade</h3>
+                <form id="form-activity-report" method="GET" action="{{ url_for('report_activity_completions') }}" style="display:flex; flex-direction:column; gap:0.75rem;">
+                    <div class="card-row">
+                        <label style="flex:1 1 auto;">
+                            Atividade
+                            <select id="activity-select" name="activity_id" class="control">
+                                <option value="">— Selecione uma atividade —</option>
+                                {% for act in activities %}
+                                <option value="{{ act.id }}" data-createdat="{{ act.createdAt if act.createdAt else '' }}">{{ act.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label style="flex:1 1 auto;">
+                            Voluntário
+                            <input list="activity-users-datalist" id="activity-user-search" class="control" placeholder="Comece a digitar para filtrar usuários">
+                            <input type="hidden" name="user_id" id="activity-user-id" value="">
+                        </label>
+                    </div>
+
+                    <div class="card-row date-row" style="align-items:center;">
+                        <label style="display:flex; gap:0.5rem; align-items:center;">Início <input type="date" name="start_date" class="control"></label>
+                        <label style="display:flex; gap:0.5rem; align-items:center;">Fim <input type="date" name="end_date" class="control"></label>
+                        <label style="display:flex; gap:0.5rem; align-items:center; margin-left:1rem;"><input type="checkbox" name="include_value" value="1" /> Incluir valor economizado</label>
+                        <div class="card-actions">
+                            <div class="export-dropdown">
+                                <button type="button" class="btn-primary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>
+                                <div class="export-menu" role="menu" aria-hidden="true">
+                                    <button type="button" class="export-item" data-format="csv" data-form-id="form-activity-report">CSV</button>
+                                    <button type="button" class="export-item" data-format="xlsx" data-form-id="form-activity-report">XLSX</button>
+                                </div>
+                            </div>
+                            <div class="export-dropdown export-todos">
+                                <button type="button" class="btn-secondary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar todos ▾</button>
+                                <div class="export-menu" role="menu" aria-hidden="true">
+                                    <button type="button" class="export-item" data-format="csv" data-form-id="form-activity-report" data-clear-user="1">CSV</button>
+                                    <button type="button" class="export-item" data-format="xlsx" data-form-id="form-activity-report" data-clear-user="1">XLSX</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Build a map of display -> id for users from the datalist options
+(() => {
+    // build array of options with value, id and cpf digits
+    const opts = Array.from(document.querySelectorAll('#users-datalist option')).map(opt => ({
+        value: (opt.value || '').trim(),
+        valueLower: (opt.value || '').toLowerCase().trim(),
+        id: opt.getAttribute('data-id') || '',
+        cpfDigits: (opt.getAttribute('data-cpf') || '').replace(/\D/g, '')
+    }));
+
+    function tolerantMatch(inputEl, hiddenEl) {
+        if (!inputEl || !hiddenEl) return;
+        inputEl.addEventListener('input', () => {
+            const v = (inputEl.value || '').trim();
+            const vLower = v.toLowerCase();
+            const vDigits = v.replace(/\D/g, '');
+
+            let found = '';
+            if (!v) {
+                hiddenEl.value = '';
+                return;
+            }
+
+            // exact match first
+            const exact = opts.find(o => o.value === v);
+            if (exact && exact.id) {
+                found = exact.id;
+            } else {
+                // substring match on display value
+                const sub = opts.find(o => o.valueLower.includes(vLower));
+                if (sub && sub.id) {
+                    found = sub.id;
+                } else if (vDigits) {
+                    // match by cpf digits
+                    const cpfMatch = opts.find(o => o.cpfDigits && o.cpfDigits.includes(vDigits));
+                    if (cpfMatch && cpfMatch.id) {
+                        found = cpfMatch.id;
+                    }
+                }
+            }
+
+            hiddenEl.value = found || '';
+        });
+    }
+
+    tolerantMatch(document.getElementById('user-search-presences'), document.getElementById('user-id-presences'));
+    tolerantMatch(document.getElementById('user-search-hours'), document.getElementById('user-id-hours'));
+    tolerantMatch(document.getElementById('activity-user-search'), document.getElementById('activity-user-id'));
+})();
+</script>
+<script id="eligible-json" type="application/json">{{ eligible_by_activity|tojson|safe }}</script>
+<script>
+(function(){
+    // read eligible map from DOM JSON blob
+    const eligibleMap = (function(){
+        try{
+            const el = document.getElementById('eligible-json');
+            if(!el) return {};
+            return JSON.parse(el.textContent || '{}');
+        }catch(e){
+            return {};
+        }
+    })();
+    const activitySelect = document.getElementById('activity-select');
+    const activityUserInput = document.getElementById('activity-user-search');
+    const activityUsersDatalist = document.getElementById('activity-users-datalist');
+
+    function populateActivityDatalist(list){
+        if(!activityUsersDatalist) return;
+        activityUsersDatalist.innerHTML = '';
+        // default "Todos"
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        activityUsersDatalist.appendChild(defaultOpt);
+
+        for (const u of list || []){
+            const el = document.createElement('option');
+            el.value = u.display;
+            el.setAttribute('data-id', u.id || '');
+            activityUsersDatalist.appendChild(el);
+        }
+    }
+
+    function populateForActivity(actId){
+        const list = eligibleMap[actId] || []; // array of {id,display}
+        // if no activity selected, use global users list from users-datalist
+        if (!actId){
+            const users = [];
+            document.querySelectorAll('#users-datalist option[data-id]').forEach(opt => {
+                users.push({id: opt.getAttribute('data-id'), display: opt.value});
+            });
+            populateActivityDatalist(users);
+            return;
+        }
+
+        populateActivityDatalist(list);
+    }
+
+    // initial populate
+    populateForActivity('');
+
+    activitySelect && activitySelect.addEventListener('change', function(){
+        populateForActivity(this.value);
+        // clear any previously typed value/selected id
+        if(activityUserInput) activityUserInput.value = '';
+        const hid = document.getElementById('activity-user-id');
+        if(hid) hid.value = '';
+    });
+})();
+</script>
+{% endblock %}

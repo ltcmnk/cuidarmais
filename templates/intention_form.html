@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Quero ser Voluntário - Cuidar+{% endblock %}
+
+{% block content %}
+
+        <div class="center-container">
+            <div class="center-inner">
+                <header class="content-header" style="flex-direction:column; align-items:center; text-align:center; margin-bottom:0.5rem;">
+                        <h1>Quero ser Voluntário</h1>
+                        <p class="subtitle">Preencha o formulário em 3 etapas — leva só alguns minutos</p>
+                </header>
+                <div class="form-container wide">
+                    <form id="intentionForm" method="POST" action="{{ url_for('submit_intention') }}" novalidate>
+
+            <div class="form-steps-progress" style="margin-bottom:1rem; display:flex; gap:0.5rem; align-items:center;">
+                <div id="stepIndicator" aria-hidden="true">Etapa <span id="currentStep">1</span> / 3</div>
+                <div style="flex:1; height:8px; background:var(--bg-tertiary); border-radius:8px; overflow:hidden;">
+                    <div id="progressBar" style="height:8px; width:0%; background:var(--accent);"></div>
+                </div>
+            </div>
+
+            <!-- Step 1: Dados pessoais -->
+            <section class="step" data-step="1">
+                <h3>1. Dados pessoais</h3>
+
+                <div class="form-group">
+                    <label for="hospital">Hospital de preferência</label>
+                    <select id="hospital" name="hospital" class="control">
+                        <option value="">--</option>
+                        <option value="HMC">Hospital São Marcelino Champagnat</option>
+                        <option value="HUC">Hospital Universitário Cajuru</option>
+                    </select>
+                </div>
+
+                <div class="inline-controls">
+                    <div class="flex-1">
+                        <label for="nome">Nome *</label>
+                        <input id="nome" name="nome" class="control" required>
+                    </div>
+                    <div class="flex-1">
+                        <label for="sobrenome">Sobrenome *</label>
+                        <input id="sobrenome" name="sobrenome" class="control" required>
+                    </div>
+                </div>
+
+                <div class="inline-controls">
+                    <div class="flex-1">
+                        <label for="data_nascimento">Data de Nascimento *</label>
+                        <input type="date" id="data_nascimento" name="data_nascimento" class="control" required>
+                    </div>
+                    <div class="flex-1">
+                        <label for="local_nascimento">Local de Nascimento</label>
+                        <input id="local_nascimento" name="local_nascimento" class="control">
+                    </div>
+                </div>
+
+                <div class="inline-controls">
+                    <div class="flex-1">
+                        <label for="rg">RG *</label>
+                        <input id="rg" name="rg" class="control" required>
+                    </div>
+                    <div class="flex-1">
+                        <label for="cpf">CPF *</label>
+                        <input id="cpf" name="cpf" class="control" required>
+                        <div id="intention_week_warning" style="margin-top:0.4rem; color:var(--warn-color); font-weight:600; display:none;"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="estado_civil">Estado civil</label>
+                    <select id="estado_civil" name="estado_civil" class="control">
+                        <option value="">--</option>
+                        <option>Solteiro</option>
+                        <option>Casado</option>
+                        <option>Separado</option>
+                        <option>Divorciado</option>
+                        <option>Viúvo</option>
+                    </select>
+                </div>
+
+                <div id="conjuge_group" class="form-group conditional-hidden">
+                    <label for="nome_conjuge">Nome do cônjuge</label>
+                    <input id="nome_conjuge" name="nome_conjuge" class="control">
+                </div>
+
+                <div class="inline-controls">
+                    <div class="flex-1">
+                        <label for="nome_pai">Nome do pai</label>
+                        <input id="nome_pai" name="nome_pai" class="control">
+                    </div>
+                    <div class="flex-1">
+                        <label for="nome_mae">Nome da mãe</label>
+                        <input id="nome_mae" name="nome_mae" class="control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="endereco">Endereço residencial *</label>
+                    <input id="endereco" name="endereco" class="control" required>
+                </div>
+
+                <div class="inline-controls">
+                    <div class="narrow">
+                        <label for="numero">Nº (Endereço) *</label>
+                        <input id="numero" name="numero" class="control" required>
+                    </div>
+                    <div class="flex-1">
+                        <label for="bairro">Bairro *</label>
+                        <input id="bairro" name="bairro" class="control" required>
+                    </div>
+                </div>
+
+                <div class="inline-controls city-cep">
+                    <div class="flex-1">
+                        <label for="cidade">Cidade *</label>
+                        <input id="cidade" name="cidade" class="control" required>
+                    </div>
+                    <div class="narrow">
+                        <label for="cep">CEP *</label>
+                        <input id="cep" name="cep" class="control" required>
+                    </div>
+                </div>
+
+                <div class="inline-controls">
+                    <div class="flex-1">
+                        <label for="telefone_residencial">Telefone residencial</label>
+                        <input id="telefone_residencial" name="telefone_residencial" class="control">
+                    </div>
+                    <div class="flex-1">
+                        <label for="celular">Celular *</label>
+                        <input id="celular" name="celular" class="control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="religiao">Religião</label>
+                    <input id="religiao" name="religiao" class="control">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail *</label>
+                    <input id="email" name="email" type="email" class="control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="escolaridade_curso">Escolaridade / Curso</label>
+                    <input id="escolaridade_curso" name="escolaridade_curso" class="control">
+                </div>
+
+                <div class="form-group">
+                    <label for="local_trabalho">Local de trabalho</label>
+                    <input id="local_trabalho" name="local_trabalho" class="control">
+                </div>
+
+                <div class="form-group">
+                    <label for="telefone_trabalho">Telefone do trabalho</label>
+                    <input id="telefone_trabalho" name="telefone_trabalho" class="control">
+                </div>
+
+                <div class="form-group">
+                    <label for="ocupacao">Ocupação</label>
+                    <select id="ocupacao" name="ocupacao" class="control">
+                        <option value="">--</option>
+                        <option value="aposentado">Aposentado</option>
+                        <option value="empregado">Empregado</option>
+                        <option value="autonomo">Autônomo</option>
+                        <option value="do lar">Do lar</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+
+                <div id="ocupacao_outro_group" class="form-group conditional-hidden">
+                    <label for="ocupacao_outro">Ocupação (outro)</label>
+                    <input id="ocupacao_outro" name="ocupacao_outro" class="control">
+                </div>
+
+                <div class="form-group">
+                    <label>Faz tratamento de saúde / acompanhamento médico?</label>
+                    <div class="form-row">
+                        <label><input type="radio" name="acomp_med_radio" value="no" checked> Não</label>
+                        <label><input type="radio" name="acomp_med_radio" value="yes"> Sim</label>
+                    </div>
+                </div>
+
+                <div id="acomp_med_qual_group" class="form-group conditional-hidden">
+                    <label for="acomp_med_qual">Qual e para quê?</label>
+                    <input id="acomp_med_qual" name="acomp_med_qual" class="control" disabled placeholder="ex.: diabetes — controle diário">
+                </div>
+
+                <div class="form-group">
+                    <label for="transporte">Que tipo de transporte utiliza para chegar ao hospital?</label>
+                    <input id="transporte" name="transporte" class="control">
+                </div>
+
+                <div class="form-group">
+                    <label for="ficou_sab">Como ficou sabendo do voluntariado?</label>
+                    <input id="ficou_sab" name="ficou_sab" class="control">
+                </div>
+
+                <div class="step-actions" style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;">
+                    <button type="button" class="btn-secondary" id="nextBtn1">Próximo</button>
+                </div>
+            </section>
+
+            <!-- Step 2: Experiências -->
+            <section class="step" data-step="2" hidden>
+                <h3>2. Experiências</h3>
+                <div class="form-group">
+                    <label>Já trabalhou como voluntário?</label>
+                    <div class="form-row">
+                        <label><input type="radio" name="ja_volunt_radio" value="no" checked> Não</label>
+                        <label><input type="radio" name="ja_volunt_radio" value="yes"> Sim</label>
+                    </div>
+                    <div id="ja_volunt_onde_group" class="form-group conditional-hidden" style="margin-top:0.5rem;">
+                        <input id="ja_volunt_onde" name="ja_volunt_onde" class="control" disabled placeholder="Onde?">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="group_volunteer">Faz parte de algum grupo de voluntariado? Qual?</label>
+                    <input id="group_volunteer" name="group_volunteer" class="control">
+                </div>
+
+                <div class="form-group">
+                    <label for="contrib_ser">De que maneira você acha que pode contribuir? O que é ser voluntário para você?</label>
+                    <textarea id="contrib_ser" name="contrib_ser" class="control" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Tem alguma habilidade musical?</label>
+                    <div class="form-row">
+                        <label><input type="radio" name="hab_musical_radio" value="no" checked> Não</label>
+                        <label><input type="radio" name="hab_musical_radio" value="yes"> Sim</label>
+                    </div>
+                    <div id="hab_musical_qual_group" class="form-group conditional-hidden" style="margin-top:0.5rem;">
+                        <input id="hab_musical_qual" name="hab_musical_qual" class="control" disabled placeholder="Qual?">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Você se sente à vontade para auxiliar um paciente na alimentação?</label>
+                    <div class="form-row">
+                        <label><input type="radio" name="aux_alimentacao_radio" value="no" checked> Não</label>
+                        <label><input type="radio" name="aux_alimentacao_radio" value="yes"> Sim</label>
+                    </div>
+                </div>
+
+                <div class="step-actions" style="display:flex; justify-content:space-between; gap:0.5rem; margin-top:1rem;">
+                    <button type="button" class="btn-secondary" id="prevBtn2">Anterior</button>
+                    <button type="button" class="btn-secondary" id="nextBtn2">Próximo</button>
+                </div>
+            </section>
+
+            <!-- Step 3: Disponibilidade -->
+            <section class="step" data-step="3" hidden>
+                <h3>3. Disponibilidade (Máx 15 h/semana)</h3>
+                <div class="form-group">
+                    <small class="muted-text">Marque os dias e informe horários (ex.: 09:00 - 12:00)</small>
+                </div>
+                <div class="form-group">
+                    <div class="availability-grid">
+                        <div class="availability-grid-header">
+                            <div>Dia</div>
+                            <div>Início</div>
+                            <div>Fim</div>
+                        </div>
+                        {% for d,label in [('seg','2ª feira'),('ter','3ª feira'),('qua','4ª feira'),('qui','5ª feira'),('sex','6ª feira'),('sab','Sábado'),('dom','Domingo')] %}
+                        <div class="availability-row">
+                            <div class="form-row">
+                                <label><input type="checkbox" id="avail_{{ d }}_on" name="avail_{{ d }}_on" value="1"> {{ label }}</label>
+                            </div>
+                            <div>
+                                <input type="time" name="avail_{{ d }}_start" class="time-input" disabled>
+                            </div>
+                            <div>
+                                <input type="time" name="avail_{{ d }}_end" class="time-input" disabled>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="step-actions" style="display:flex; justify-content:space-between; gap:0.5rem; margin-top:1rem;">
+                    <button type="button" class="btn-secondary" id="prevBtn3">Anterior</button>
+                    <button type="submit" class="btn-primary" id="submitBtn">Enviar inscrição</button>
+                </div>
+            </section>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% block scripts %}{% endblock %}
+
+        {% if cpf_week_map is defined %}
+        <script id="cpf_week_map_data" type="application/json">{{ cpf_week_map|tojson }}</script>
+        <script>
+        function readJsonBlock(id){ try{ const el = document.getElementById(id); return el ? JSON.parse(el.textContent || '{}') : {}; }catch(e){ return {}; } }
+        document.addEventListener('DOMContentLoaded', function(){
+            const cpfInput = document.getElementById('cpf');
+            const warnEl = document.getElementById('intention_week_warning');
+            if (!cpfInput || !warnEl) return;
+            const CPF_WEEK_MAP = readJsonBlock('cpf_week_map_data');
+            cpfInput.addEventListener('input', function(){
+                const v = (cpfInput.value || '').replace(/\D/g, '');
+                if (!v) { warnEl.style.display='none'; warnEl.textContent=''; return; }
+                const obj = CPF_WEEK_MAP && CPF_WEEK_MAP[v];
+                if (obj){
+                    const secs = parseInt(obj.secs || 0, 10);
+                    const hrs = Math.floor(secs/3600);
+                    const mins = Math.floor((secs%3600)/60);
+                    const MAX = 15*3600; const ALERT = 14*3600;
+                    const role = obj.role || '';
+                    if (role === 'admin'){
+                        if (secs >= MAX){ warnEl.style.display='block'; warnEl.textContent = `Voluntário existente (${obj.name}) é administrador e atingiu ${hrs}h ${mins}m (isento do limite).`; }
+                        else if (secs >= ALERT){ warnEl.style.display='block'; warnEl.textContent = `Voluntário existente (${obj.name}) é administrador e tem ${hrs}h ${mins}m (isento do limite).`; }
+                        else { warnEl.style.display='none'; warnEl.textContent=''; }
+                    } else {
+                        if (secs >= MAX){ warnEl.style.display='block'; warnEl.textContent = `Voluntário existente (${obj.name}) atingiu o limite semanal de 15h (${hrs}h ${mins}m).`; }
+                        else if (secs >= ALERT){ warnEl.style.display='block'; warnEl.textContent = `Voluntário existente (${obj.name}) aproxima-se do limite semanal (${hrs}h ${mins}m).`; }
+                        else { warnEl.style.display='none'; warnEl.textContent=''; }
+                    }
+                } else { warnEl.style.display='none'; warnEl.textContent=''; }
+            });
+        });
+        </script>
+        {% endif %}
+
+{% endblock %}

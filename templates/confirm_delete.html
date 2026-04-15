@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmar Remoção - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Confirmar remoção</h1>
+        </header>
+
+        <div class="form-container">
+            <p>Tem certeza que deseja remover o voluntário <strong>{{ user.nome_completo or user.nome }}</strong> ({{ user.username }})?</p>
+            {% if require_password %}
+            <p>Este voluntário tem privilégios de administrador. Para confirmar, insira sua senha de administrador.</p>
+            {% endif %}
+
+            <form method="POST">
+                {% if require_password %}
+                <div class="form-group">
+                    <label for="admin_password">Senha do administrador</label>
+                    <input type="password" id="admin_password" name="admin_password" class="control" required>
+                </div>
+                {% endif %}
+                <div class="form-actions">
+                    <a href="{{ url_for('users') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-danger">Confirmar remoção</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+        <div class="sidebar-footer">

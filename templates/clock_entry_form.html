@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}{% if entry %}Editar Registro{% else %}Adicionar Registro{% endif %} - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>{% if entry %}Editar Registro{% else %}Adicionar Registro{% endif %}</h1>
+                <p>Registre manualmente uma entrada ou saída</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST">
+                {% if current_user_role == 'admin' %}
+                <div class="form-group">
+                    <label for="user_id">Voluntário</label>
+                    <div style="display:flex; gap:0.5rem; flex-direction:column;">
+                        <!-- input with datalist for searchable selector -->
+                        <input list="users-datalist-clock" id="user_search_select" class="control" placeholder="Comece a digitar para filtrar e escolher" aria-label="Filtrar voluntários">
+                        <datalist id="users-datalist-clock">
+                            {% for u in users %}
+                                <option value="{{ (u.nome_completo|default(u.nome)|default('')) ~ ' ' ~ (u.username|default('')) }}" data-id="{{ u.id }}"></option>
+                            {% endfor %}
+                        </datalist>
+                        <!-- hidden user_id will be set from the chosen datalist option -->
+                        <input type="hidden" id="user_id" name="user_id" value="{{ entry.userId if entry else '' }}">
+                    </div>
+                    <div id="week_warning" style="margin-top:0.5rem; color:var(--warn-color); font-weight:600; display:none;"></div>
+                </div>
+                {% endif %}
+
+                <!-- Hidden SQL-compatible fields (presenca) -->
+                <input type="hidden" id="sql_idvoluntariado" name="idvoluntariado" value="">
+                <input type="hidden" id="sql_idescala_voluntario" name="idescala_voluntario" value="">
+                <input type="hidden" id="sql_hora_entrada" name="hora_entrada" value="">
+                <input type="hidden" id="sql_hora_saida" name="hora_saida" value="">
+                <input type="hidden" id="sql_status_presenca" name="status_presenca" value="">
+
+                <div class="form-group">
+                    <label for="type">Tipo</label>
+                    <select id="type" name="type" class="control">
+                        <option value="in" {% if entry and entry.type == 'in' %}selected{% endif %}>Entrada</option>
+                        <option value="out" {% if entry and entry.type == 'out' %}selected{% endif %}>Saída</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="timestamp">Data e hora</label>
+                    <input id="timestamp" name="timestamp" type="datetime-local" class="control" value="{{ entry.timestamp if entry else '' }}">
+                    <div class="muted-text" style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Observações</label>
+                    <textarea id="notes" name="notes" rows="3" class="control">{{ entry.notes if entry else '' }}</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('clock_entries') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    // Elements
+    const typeEl = document.getElementById('type');
+    const timestampEl = document.getElementById('timestamp');
+    const sqlIn = document.getElementById('sql_hora_entrada');
+    const sqlOut = document.getElementById('sql_hora_saida');
+    const sqlStatus = document.getElementById('sql_status_presenca');
+    const userInput = document.getElementById('user_search_select');
+    const userDatalist = document.getElementById('users-datalist-clock');
+    const userIdHidden = document.getElementById('user_id');
+    const sqlVol = document.getElementById('sql_idvoluntariado');
+
+    // helper to read JSON blob placed in a <script type="application/json"> block
+    function readJsonBlock(id){ try{ const el = document.getElementById(id); return el ? JSON.parse(el.textContent || '{}') : {}; }catch(e){ return {}; } }
+
+    // Map datalist selection to hidden user_id
+    if (userInput && userDatalist && userIdHidden){
+        userInput.addEventListener('input', function(){
+            const v = (userInput.value || '').trim();
+            let foundId = '';
+            // exact match first
+            Array.from(userDatalist.options).forEach(opt => {
+                if (opt.value === v && opt.dataset && opt.dataset.id){
+                    foundId = opt.dataset.id;
+                }
+            });
+            // if not found, try case-insensitive substring match on display
+            if (!foundId && v){
+                const vLower = v.toLowerCase();
+                const sub = Array.from(userDatalist.options).find(opt => (opt.value || '').toLowerCase().includes(vLower));
+                if (sub && sub.dataset) foundId = sub.dataset.id || '';
+            }
+            userIdHidden.value = foundId;
+            if (sqlVol) sqlVol.value = foundId; // keep SQL mapping in sync for admin flows
+            // show weekly-hours warning if available
+            try{
+                const weekMap = readJsonBlock('users_week_data');
+                const roleMap = readJsonBlock('users_role_data');
+                const warningEl = document.getElementById('week_warning');
+                if (foundId && weekMap[foundId]){
+                    const secs = parseInt(weekMap[foundId] || 0, 10);
+                    const hrs = Math.floor(secs/3600);
+                    const mins = Math.floor((secs%3600)/60);
+                    const MAX = 15*3600;
+                    const ALERT = 14*3600;
+                    const role = roleMap[foundId] || '';
+                    if (role === 'admin'){
+                        // admins are exempt: show info but do not disable
+                        warningEl.style.display = 'block';
+                        if (secs >= MAX){
+                            warningEl.textContent = `Administrador: atingiu ${hrs}h ${mins}m esta semana (isento do limite de 15h).`;
+                        } else if (secs >= ALERT){
+                            warningEl.textContent = `Administrador: ${hrs}h ${mins}m esta semana (isento do limite).`;
+                        } else {
+                            warningEl.style.display = 'none'; warningEl.textContent = '';
+                        }
+                        const submit = document.querySelector('button[type="submit"]'); if (submit) submit.disabled = false;
+                    } else {
+                        if (secs >= MAX){
+                            warningEl.style.display = 'block';
+                            warningEl.textContent = `Limite semanal de 15h atingido (${hrs}h ${mins}m) — não é possível registrar ponto.`;
+                            // disable submit
+                            const submit = document.querySelector('button[type="submit"]'); if (submit) submit.disabled = true;
+                        } else if (secs >= ALERT){
+                            warningEl.style.display = 'block';
+                            warningEl.textContent = `Atenção: voluntário aproximou-se do limite semanal (${hrs}h ${mins}m).`;
+                            const submit = document.querySelector('button[type="submit"]'); if (submit) submit.disabled = false;
+                        } else {
+                            warningEl.style.display = 'none'; warningEl.textContent = '';
+                            const submit = document.querySelector('button[type="submit"]'); if (submit) submit.disabled = false;
+                        }
+                    }
+                } else {
+                    const warningEl = document.getElementById('week_warning'); if (warningEl){ warningEl.style.display='none'; warningEl.textContent=''; }
+                    const submit = document.querySelector('button[type="submit"]'); if (submit) submit.disabled = false;
+                }
+            }catch(e){}
+        });
+    }
+
+    // time control buttons: now, increment and decrement
+    const timeNowBtn = document.getElementById('time_now');
+    const timeIncrBtn = document.getElementById('time_incr');
+    const timeDecrBtn = document.getElementById('time_decr');
+    const timeStepSel = document.getElementById('time_step_selector');
+
+    function adjustMinutes(deltaMinutes){
+        if (!timestampEl) return;
+        // parse existing value or use now
+        let dt = timestampEl.value ? new Date(timestampEl.value) : new Date();
+        // If datetime-local string lacks seconds, Date parsing in some browsers expects 'T' with seconds; ensure compatibility
+        if (typeof dt === 'string') dt = new Date(dt);
+        dt.setMinutes(dt.getMinutes() + deltaMinutes);
+        // format back to yyyy-mm-ddThh:mm:00
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth()+1).padStart(2,'0');
+        const day = String(dt.getDate()).padStart(2,'0');
+        const hh = String(dt.getHours()).padStart(2,'0');
+        const mm = String(dt.getMinutes()).padStart(2,'0');
+        timestampEl.value = `${y}-${m}-${day}T${hh}:${mm}:00`;
+    }
+
+    if (timeNowBtn) timeNowBtn.addEventListener('click', function(){
+        const now = new Date();
+        const y = now.getFullYear(); const mo = String(now.getMonth()+1).padStart(2,'0'); const d = String(now.getDate()).padStart(2,'0');
+        const hh = String(now.getHours()).padStart(2,'0'); const mm = String(now.getMinutes()).padStart(2,'0');
+        timestampEl.value = `${y}-${mo}-${d}T${hh}:${mm}:00`;
+    });
+    if (timeIncrBtn) timeIncrBtn.addEventListener('click', function(){
+        const step = parseInt(timeStepSel.value || '15', 10); adjustMinutes(step);
+    });
+    if (timeDecrBtn) timeDecrBtn.addEventListener('click', function(){
+        const step = parseInt(timeStepSel.value || '15', 10); adjustMinutes(-step);
+    });
+
+    function sync(){
+        const t = timestampEl ? timestampEl.value : '';
+        if (!t) return;
+        if (typeEl && typeEl.value === 'in'){
+            if (sqlIn) sqlIn.value = t;
+            if (sqlOut) sqlOut.value = '';
+            if (sqlStatus) sqlStatus.value = 'presente';
+        } else {
+            if (sqlOut) sqlOut.value = t;
+            if (sqlIn) sqlIn.value = '';
+            if (sqlStatus) sqlStatus.value = 'finalizado';
+        }
+    }
+    if (typeEl) typeEl.addEventListener('change', sync);
+    if (timestampEl) timestampEl.addEventListener('change', sync);
+    const form = document.querySelector('form');
+    if (form) form.addEventListener('submit', sync);
+});
+</script>
+{% if users_week_map is defined %}
+<script id="users_week_data" type="application/json">{{ users_week_map|tojson }}</script>
+{% else %}
+<script id="users_week_data" type="application/json">{}</script>
+{% endif %}
+{% if users_role_map is defined %}
+<script id="users_role_data" type="application/json">{{ users_role_map|tojson }}</script>
+{% else %}
+<script id="users_role_data" type="application/json">{}</script>
+{% endif %}
+{% endblock %}

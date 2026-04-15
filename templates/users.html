@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Usuários - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+
+    <main id="main-content" class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Usuários</h1>
+                <p>Gerenciar usuários do sistema</p>
+            </div>
+            {% if current_user_role == 'admin' %}
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+                <a href="{{ url_for('add_user') }}" class="btn-primary">+ Adicionar Usuário</a>
+                <a href="{{ url_for('register_badge') }}" class="btn-secondary" aria-label="Registrar crachá">Registrar Crachá</a>
+            </div>
+            {% endif %}
+        </header>
+
+        <div class="filter-container" style="margin-bottom:1rem;">
+            <form method="GET" action="{{ url_for('users') }}" class="filter-form">
+                <input id="user-search-input" class="search-input" aria-label="Pesquisar usuários" type="search" name="q" placeholder="Pesquisar por nome, usuário ou CPF" value="{{ q if q else '' }}" autocomplete="off">
+                <select name="role" class="control" style="min-width:160px;">
+                    <option value="">Todos os papéis</option>
+                    <option value="admin" {% if role_selected == 'admin' %}selected{% endif %}>Administrador</option>
+                    <option value="user" {% if role_selected == 'user' %}selected{% endif %}>Voluntário</option>
+                </select>
+                <select name="status" class="control" style="min-width:160px;">
+                    <option value="">Todos</option>
+                    <option value="active" {% if status_selected == 'active' %}selected{% endif %}>Ativos</option>
+                    <option value="inactive" {% if status_selected == 'inactive' %}selected{% endif %}>Inativos</option>
+                </select>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button type="submit" class="btn-primary" aria-label="Pesquisar">Pesquisar</button>
+                    <a href="{{ url_for('users.users') }}" class="btn-secondary" role="button">Limpar</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Usuário</th>
+                        <th>Função</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr data-user-id="{{ user.id }}"
+                        data-estado_user="{{ user.get('estado_user', 1) }}"
+                        data-hospital="{{ user.get('hospital','') if user and user.get('hospital') else (user.hospital if user and user.hospital else '') }}"
+                        data-nome="{{ user.get('nome','') if user and user.get('nome') else '' }}"
+                        data-sobrenome="{{ user.get('sobrenome','') if user and user.get('sobrenome') else '' }}"
+                        data-data_nascimento="{{ user.get('data_nascimento','') if user and user.get('data_nascimento') else (user.data_nascimento if user and user.data_nascimento else '') }}"
+                        data-local_nascimento="{{ user.get('local_nascimento','') if user and user.get('local_nascimento') else (user.local_nascimento if user and user.local_nascimento else '') }}"
+                        data-rg="{{ user.get('rg','') if user and user.get('rg') else (user.rg if user and user.rg else '') }}"
+                        data-cpf="{{ user.get('cpf','') if user and user.get('cpf') else (user.cpf if user and user.cpf else '') }}"
+                        data-endereco="{{ user.get('endereco','') if user and user.get('endereco') else (user.endereco if user and user.endereco else '') }}"
+                        data-numero="{{ user.get('numero','') if user and user.get('numero') else (user.numero if user and user.numero else '') }}"
+                        data-bairro="{{ user.get('bairro','') if user and user.get('bairro') else (user.bairro if user and user.bairro else '') }}"
+                        data-cep="{{ user.get('cep','') if user and user.get('cep') else (user.cep if user and user.cep else '') }}"
+                        data-cidade="{{ user.get('cidade','') if user and user.get('cidade') else (user.cidade if user and user.cidade else '') }}"
+                        data-telefone_residencial="{{ user.get('telefone_residencial','') if user and user.get('telefone_residencial') else (user.telefone_residencial if user and user.telefone_residencial else '') }}"
+                        data-celular="{{ user.get('celular','') if user and user.get('celular') else (user.celular if user and user.celular else '') }}"
+                        data-email="{{ user.get('email','') if user and user.get('email') else (user.email if user and user.email else '') }}"
+                        data-estado_civil="{{ user.get('estado_civil','') if user and user.get('estado_civil') else (user.estado_civil if user and user.estado_civil else '') }}"
+                        data-nome_conjuge="{{ user.get('nome_conjuge','') if user and user.get('nome_conjuge') else (user.nome_conjuge if user and user.nome_conjuge else '') }}"
+                        data-religiao="{{ user.get('religiao','') if user and user.get('religiao') else (user.religiao if user and user.religiao else '') }}"
+                        data-escolaridade_curso="{{ user.get('escolaridade_curso','') if user and user.get('escolaridade_curso') else (user.escolaridade_curso if user and user.escolaridade_curso else '') }}"
+                        data-local_trabalho="{{ user.get('local_trabalho','') if user and user.get('local_trabalho') else (user.local_trabalho if user and user.local_trabalho else '') }}"
+                        data-telefone_trabalho="{{ user.get('telefone_trabalho','') if user and user.get('telefone_trabalho') else (user.telefone_trabalho if user and user.telefone_trabalho else '') }}"
+                        data-ocupacao="{{ user.get('ocupacao','') if user and user.get('ocupacao') else (user.ocupacao if user and user.ocupacao else '') }}"
+                        data-ocupacao_outro="{{ user.get('ocupacao_outro','') if user and user.get('ocupacao_outro') else (user.ocupacao_outro if user and user.ocupacao_outro else '') }}"
+                        data-acomp_med="{{ user.get('acomp_med','') if user and user.get('acomp_med') else (user.acomp_med if user and user.acomp_med else '') }}"
+                        data-acomp_med_qual="{{ user.get('acomp_med_qual','') if user and user.get('acomp_med_qual') else (user.acomp_med_qual if user and user.acomp_med_qual else '') }}"
+                        data-transporte="{{ user.get('transporte','') if user and user.get('transporte') else (user.transporte if user and user.transporte else '') }}"
+                        data-ficou_sab="{{ user.get('ficou_sab','') if user and user.get('ficou_sab') else (user.ficou_sab if user and user.ficou_sab else '') }}"
+                        data-ja_volunt="{{ user.get('ja_volunt','') if user and user.get('ja_volunt') else (user.ja_volunt if user and user.ja_volunt else '') }}"
+                        data-ja_volunt_onde="{{ user.get('ja_volunt_onde','') if user and user.get('ja_volunt_onde') else (user.ja_volunt_onde if user and user.ja_volunt_onde else '') }}"
+                        data-contrib_ser="{{ user.get('contrib_ser','') if user and user.get('contrib_ser') else (user.contrib_ser if user and user.contrib_ser else '') }}"
+                        data-hab_musical="{{ user.get('hab_musical','') if user and user.get('hab_musical') else (user.hab_musical if user and user.hab_musical else '') }}"
+                        data-hab_musical_qual="{{ user.get('hab_musical_qual','') if user and user.get('hab_musical_qual') else (user.hab_musical_qual if user and user.hab_musical_qual else '') }}"
+                        data-aux_alimentacao="{{ user.get('aux_alimentacao','') if user and user.get('aux_alimentacao') else (user.aux_alimentacao if user and user.aux_alimentacao else '') }}"
+                        data-username="{{ user.username if user and user.username else '' }}"
+                        data-codigo_cracha="{{ user.codigo_cracha if user and user.codigo_cracha else '' }}"
+                        data-role="{{ user.role if user and user.role else '' }}"
+                        data-hours="{{ user.hours_str if user and user.hours_str else '' }}"
+                        {% for d,label in [('seg','seg'),('ter','ter'),('qua','qua'),('qui','qui'),('sex','sex'),('sab','sab'),('dom','dom')] %}
+                        data-avail_{{ d }}_on="{{ user.get('avail_' ~ d ~ '_on','') if user and user.get('avail_' ~ d ~ '_on') else '' }}"
+                        data-avail_{{ d }}_start="{{ user.get('avail_' ~ d ~ '_start','') if user and user.get('avail_' ~ d ~ '_start') else '' }}"
+                        data-avail_{{ d }}_end="{{ user.get('avail_' ~ d ~ '_end','') if user and user.get('avail_' ~ d ~ '_end') else '' }}"
+                        {% endfor %}>
+                        <td class="col-name">{{ user.nome_completo}}</td>
+                        <td class="col-username">{{ user.username }}</td>
+                        <td class="col-role">
+                            <span class="badge badge-{{ user.role }}">
+                                {{ 'administrador' if user.role == 'admin' else 'voluntário' }}
+                            </span>
+                        </td>
+                        <td class="col-actions">
+                            <div class="action-buttons">
+                                <button type="button" class="btn-small btn-secondary" onclick="openUserModal('{{ user.id }}')">Ver mais</button>
+                                <form method="GET" action="{{ url_for('edit_user', user_id=user.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn-small btn-edit">Editar</button>
+                                </form>
+                                {% if current_user_role == 'admin' %}
+                                    <form method="POST" action="{{ url_for('users.toggle_active', user_id=user.id) }}" style="display:inline;" class="toggle-active-form confirm-action" data-confirm-message="">
+                                        {# Button label reflects the action that will be taken: show "Desativar" when the user is active, "Ativar" when inactive #}
+                                        {% if user.get('estado_user', 1) == 1 %}
+                                            <button type="submit" class="btn-small btn-danger" title="Desativar usuário">Desativar</button>
+                                        {% else %}
+                                            <button type="submit" class="btn-small btn-success" title="Ativar usuário">Ativar</button>
+                                        {% endif %}
+                                    </form>
+                                {% endif %}
+                                {% if current_user_role == 'admin' %}
+                                    <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" style="display:inline;" class="delete-user-form confirm-action" data-confirm-message="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.">
+                                        <button type="submit" class="btn-small btn-danger">Excluir</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="no-results-row" style="display:none;">
+                        <td colspan="4" class="muted-text">Nenhum usuário encontrado.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<div id="user-modal-backdrop" class="modal-backdrop" aria-hidden="true" style="display:none;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
+        <header class="modal-header">
+            <h2 id="user-modal-title">&nbsp;</h2>
+            <button class="modal-close" aria-label="Fechar" onclick="closeUserModal()">×</button>
+        </header>
+        <div class="modal-body" id="user-modal-body">
+            <!-- populated by centralized JS -->
+        </div>
+    </div>
+</div>
+<!-- Confirmation modal (used for deactivation/activation flows) -->
+<div id="confirm-modal-backdrop" class="modal-backdrop" aria-hidden="true" style="display:none;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <header class="modal-header">
+            <h2 id="confirm-modal-title">Confirmação</h2>
+            <button class="modal-close" aria-label="Fechar" onclick="closeConfirmModal()">×</button>
+        </header>
+        <div class="modal-body" id="confirm-modal-body">
+            <!-- message populated by JS -->
+        </div>
+        <footer class="modal-footer" style="display:flex; gap:0.5rem; justify-content:flex-end; padding:0.75rem 1rem 1rem;">
+            <button id="confirm-cancel" class="btn-secondary" onclick="closeConfirmModal()">Cancelar</button>
+            <button id="confirm-ok" class="btn-primary">Confirmar</button>
+        </footer>
+    </div>
+</div>
+    <script>
+    // Live client-side search for users table
+    (() => {
+        const input = document.getElementById('user-search-input');
+        if (!input) return;
+        const table = document.querySelector('.data-table tbody');
+        if (!table) return;
+        const rows = Array.from(table.querySelectorAll('tr')).filter(r => !r.id || r.id !== 'no-results-row');
+        const noResults = document.getElementById('no-results-row');
+
+        function normalize(s){ return (s||'').toString().toLowerCase().trim(); }
+
+        function matchesRow(row, q){
+            if (!q) return true;
+            const ql = q.toLowerCase();
+            const nome = normalize(row.dataset.nome) + ' ' + normalize(row.dataset.sobrenome) + ' ' + normalize(row.dataset['nome_completo'] || '');
+            const username = normalize(row.dataset.username);
+            const cpf = normalize(row.dataset.cpf);
+            return nome.includes(ql) || username.includes(ql) || cpf.includes(ql);
+        }
+
+        // simple debounce
+        let timer = null;
+        input.addEventListener('input', (e) => {
+            const q = e.target.value || '';
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                let any = false;
+                rows.forEach(r => {
+                    if (matchesRow(r, q)){
+                        r.style.display = '';
+                        any = true;
+                    } else {
+                        r.style.display = 'none';
+                    }
+                });
+                if (noResults) noResults.style.display = any ? 'none' : '';
+            }, 200);
+        });
+    })();
+    </script>
+    {% endblock %}

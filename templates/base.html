@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cuidar+{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        // Prefer to apply theme ASAP to avoid flash: read stored pref and set data-theme before CSS paints
+        (function(){
+            try {
+                var pref = localStorage.getItem('cuidar_theme_pref');
+                if (pref === 'light' || pref === 'dark') {
+                    document.documentElement.setAttribute('data-theme', pref);
+                } else {
+                    // leave unset to allow prefers-color-scheme
+                }
+            } catch(e){}
+        })();
+    </script>
+</head>
+<body>
+    <button class="sidebar-toggle" aria-label="Menu" title="Menu">☰</button>
+        {% block content %}{% endblock %}
+
+        <!-- Flash messages: unified single style, fixed at bottom for cleaner UX -->
+        <div id="flash-container" class="flash-container" aria-live="polite" aria-atomic="true" role="status">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                        {# Normalize category to choose icon (keep base .flash style unified) #}
+                        {% set kind = 'info' %}
+                        {% if category in ['success','ok','activated','activated_user'] %}
+                            {% set kind = 'success' %}
+                        {% elif category in ['error','danger','fail','failure'] %}
+                            {% set kind = 'error' %}
+                        {% elif category in ['warning','warn'] %}
+                            {% set kind = 'warning' %}
+                        {% endif %}
+                        <div class="flash flash--{{ kind }}" role="status">
+                            <span class="flash-icon" aria-hidden="true">{% if kind=='success' %}✓{% elif kind=='warning' %}⚠{% elif kind=='error' %}⚠{% else %}ℹ{% endif %}</span>
+                            <div class="flash-message">{{ msg }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/page-scripts.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Atividades - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main id="main-content" class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Atividades</h1>
+                <p>Atividades e atribuições dos voluntários</p>
+            </div>
+            {% if current_user_role == 'admin' %}
+            <a href="{{ url_for('activities.add_activity') }}" class="btn-primary">+ Nova Atividade</a>
+            {% endif %}
+        </header>
+
+        <!-- Activities displayed by fixed reporting sections -->
+        {% if activities %}
+            {% set sections = [
+                'Atendimento',
+                'Integração',
+                'Cuidando de quem cuida',
+                'Grupo de Palhaços',
+                'Projetos Parceiros',
+                'Treinamentos',
+                'Geral Voluntários'
+            ] %}
+
+            {# helper sets for matching (lowercase) #}
+            {% set cuidando_list = ['auriculoterapia','reiki'] %}
+            {% set integracao_list = ['momento musical','projeto amigo bicho','anjos solidários','anjos solidarios','contadores de estória','contadores de estoria','Origamis do bem','momento da beleza','momento beleza'] %}
+            {% set atendimento_list = ['atendimento telefônico','atendimento telefonico','acompanhamento solidário','acompanhamento solidario','visita solidária','visita solidaria','acolhimento espiritual','acolhimento familiar','acolhimento familiar - utis - hsmc','acolhimento familiar - utis - huc','auxílio alimentação','auxilio alimentacao'] %}
+            {% set grupo_palhacos_list = ['terapia intensiva do amor','t.i.a','tia','sorindo','so­rindo','semeando amor','vol. da palhaçaria'] %}
+            {% set grupo_palhacos_others = ['especialistas da alegria','avalanche do riso'] %}
+            {% set projetos_parceiros = ['coral'] %}
+
+            {% for sec in sections %}
+                {# collect activities in this section #}
+                {% set sec_acts = activities | selectattr('primary_section','equalto', sec) | list %}
+                {% if sec_acts %}
+                <section class="activity-group">
+                    <h2 class="group-title">{{ sec }}</h2>
+                    <div class="activity-cards-grid">
+                        {% for a in sec_acts %}
+                            <div class="activity-card announcements-card">
+                                <div class="card-top" style="align-items:center;">
+                                    <div class="card-emoji" aria-hidden="true">{{ a.emoji or '🗂️' }}</div>
+                                    <div class="card-title">
+                                        <h3>{{ a.title }}</h3>
+                                        <div style="display:flex; gap:0.75rem; align-items:center; margin-top:0.25rem;">
+                                            {% if current_user_role == 'admin' %}
+                                                <div class="muted-text small">{{ a.active_assigned_count if a.active_assigned_count is defined else 0 }} voluntário(s)</div>
+                                                <div class="muted-text small">Valor/h: R$ {{ '%.2f'|format(a.hourly_cost if a.hourly_cost is defined else 0.0) }}</div>
+                                            {% else %}
+                                                <div class="muted-text small">{{ a.today_count if a.today_count is defined else 0 }} registros</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer" style="display:flex; justify-content:flex-end; align-items:center; gap:0.75rem; margin-top:0.75rem;">
+                                    {% if current_user_role == 'admin' %}
+                                        <a href="{{ url_for('activities.edit_activity', act_id=a.id) }}" class="btn-small btn-edit">Editar</a>
+                                        <a href="{{ url_for('activities.assign_activity_page', act_id=a.id) }}" class="btn-small btn-primary">Voluntários</a>
+                                        <form method="POST" action="{{ url_for('activities.delete_activity', act_id=a.id) }}" style="display:inline;" onsubmit="return confirm('Remover atividade?');">
+                                            <button type="submit" class="btn-small btn-danger">Remover</button>
+                                        </form>
+                                        {% if a.value_saved_today is defined and a.value_saved_today and a.value_saved_today > 0 %}
+                                            <div class="muted-text small" style="margin-left:1rem; font-weight:600;">Economia hoje: R$ {{ '%.2f'|format(a.value_saved_today) }}</div>
+                                        {% endif %}
+                                    {% else %}
+                                        {# show completion button for assigned volunteers #}
+                                        {% set assigned_obj = (a.assigned_to | selectattr('user_id','equalto', session.get('user_id')) | list) if a and a.assigned_to else [] %}
+                                        {% set is_assigned = assigned_obj and assigned_obj[0] and not assigned_obj[0]['removed_at'] %}
+                                        {% if is_assigned %}
+                                            <form method="POST" action="{{ url_for('activities.toggle_activity_completion', act_id=a.id) }}" style="display:inline;">
+                                                <button type="submit" class="btn-small btn-primary">Registrar</button>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {# Hidden inline assign form (toggled by admin via the assign page) #}
+                            {% if current_user_role == 'admin' %}
+                            <div id="assign_panel_{{ a.id }}" class="assign-panel" style="display:none; margin-top:0.5rem; padding:0.75rem; border:1px solid var(--border); border-radius:8px; background:var(--bg-secondary);">
+                                <form method="POST" action="{{ url_for('activities.assign_activity', act_id=a.id) }}">
+                                    <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+                                        <input type="search" class="assign-search" data-target="#assign_container_{{ a.id }}" placeholder="Filtrar voluntários" style="flex:1;" />
+                                        <button type="button" class="btn-small" onclick="document.getElementById('assign_panel_{{ a.id }}').style.display='none'">Fechar</button>
+                                    </div>
+                                    <div id="assign_container_{{ a.id }}" style="max-height:220px; overflow:auto;">
+                                        {% for u in users %}
+                                            {% set assigned_obj = (a.assigned_to | selectattr('user_id','equalto', u.id) | list) if a and a.assigned_to else [] %}
+                                            {% set is_assigned = assigned_obj and assigned_obj[0] and not assigned_obj[0]['removed_at'] %}
+                                            <label style="display:block; margin-bottom:0.25rem;">
+                                                <input type="checkbox" name="assigned" value="{{ u.id }}" {% if is_assigned %}checked{% endif %}/> {{ u.nome }}{% if u.username %} ({{ u.username }}){% endif %}
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                    <div style="margin-top:0.5rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+                                        <button type="submit" class="btn-small btn-primary">Salvar</button>
+                                        <button type="button" class="btn-small" onclick="document.getElementById('assign_panel_{{ a.id }}').style.display='none'">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p>Nenhuma atividade encontrada.</p>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
+<script>
+// wire up add-volunteer buttons to toggle their panels and filter the lists
+document.addEventListener('DOMContentLoaded', function(){
+    // delegated filter for assign search fields (used by inline assign panels, if visible)
+    document.querySelectorAll('.assign-search').forEach(input => {
+        const target = document.querySelector(input.dataset.target);
+        if (!target) return;
+        input.addEventListener('input', function(){
+            const q = (this.value || '').toLowerCase().trim();
+            target.querySelectorAll('label').forEach(lbl => {
+                const txt = (lbl.textContent || '').toLowerCase();
+                lbl.style.display = !q || txt.includes(q) ? 'block' : 'none';
+            });
+        });
+    });
+});
+</script>
+

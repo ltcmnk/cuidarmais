@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main id="main-content" class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Painel de Controle</h1>
+                <p>Visão geral — destaque para notificações e ações rápidas</p>
+            </div>
+            <div style="display:flex; gap:1rem; align-items:center;">
+                <div class="last-punch">Último ponto: <strong>{{ last_punch if last_punch else 'Nenhum registro' }}</strong></div>
+                <form method="POST" action="{{ url_for('toggle_clock_entry') }}">
+                    <button type="submit" class="btn-primary">Registrar {{ next_quick }}</button>
+                </form>
+            </div>
+        </header>
+
+        <div class="top-cards">
+            <div class="announcements-card">
+                <div class="card-top">
+                    <div class="card-top-icon" aria-hidden="true">📣</div>
+                    <h3>Avisos</h3>
+                </div>
+
+                <ul class="compact-list">
+                    {% if announcements %}
+                        {% for a in announcements %}
+                        <li class="compact-item">
+                            <div class="card-row">
+                                <div class="item-left">
+                                    <div class="title-row">
+                                        <strong class="announcement-title">{{ a.title or a.message[:40] }}</strong>
+                                    </div>
+                                    {% if a.authorName %}
+                                    <div class="muted-text"><small>{{ a.authorName }}</small></div>
+                                    {# Mobile-only: duplicate createdAt next to author so we can show it inline on small screens #}
+                                    <div class="muted-text mobile-created" style="display:none;"><small>{{ a.createdAt|shortdate }}</small></div>
+                                    {% endif %}
+                                </div>
+                                <div class="item-meta">
+                                    <div class="muted-text"><small>{{ a.createdAt|shortdate }}</small></div>
+                                    {% if a.important or a.is_new %}
+                                    <div class="badges-row">
+                                        {% if a.important %}<span class="badge badge-new" style="background:gold; color: var(--text-secondary);">★ Importante</span>{% endif %}
+                                        {% if a.is_new %}<span class="badge badge-new">● Novo</span>{% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {# Announcement message spans full width under the title/meta row #}
+                            <div class="announcement-message" id="announcement-msg-{{ a.id }}">
+                                {% if a.message and a.message|length > 180 %}
+                                    <div class="truncated-box" id="truncated-{{ a.id }}">{{ a.message[:180] }}</div>
+                                    <div class="full-text" id="full-{{ a.id }}" aria-hidden="true">{{ a.message }}</div>
+                                    <button type="button" class="expand-btn" data-target="announcement-msg-{{ a.id }}" aria-controls="full-{{ a.id }}" aria-expanded="false">Ver mais</button>
+                                {% else %}
+                                    <div class="full-text" id="full-{{ a.id }}">{{ a.message }}</div>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li>Não há avisos publicados.</li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="birthdays-card">
+                <div class="card-top">
+                    <div class="card-top-icon" aria-hidden="true">🗓️</div>
+                    <h3>Eventos e aniversários</h3>
+                </div>
+                <ul>
+                    {% if events %}
+                        {% for e in events %}
+                        <li class="compact-item">
+                            <div class="card-row">
+                                <div class="item-left">
+                                    <div class="title-row">
+                                        <strong class="announcement-title">{{ e.title or e.name or 'Evento' }}</strong>
+                                    </div>
+                                    {% if e.scheduled_at %}
+                                    <div class="muted-text">{{ e.scheduled_at|shortdate }}{% if e.scheduled_end and 'T' in e.scheduled_end %} <span>até {{ e.scheduled_end|timeonly }}</span>{% endif %}</div>
+                                    {% elif e.date %}
+                                    <div class="muted-text">{{ e.date|shortdate }}</div>
+                                    {% endif %}
+                                    {% if e.location %}
+                                    <div class="muted-text">{{ e.location }}</div>
+                                    {% endif %}
+
+                                    {# (no mobile duplicate here) #}
+
+                                    {# show event description (use same announcement-message layout) #}
+                                    {% if e.description %}
+                                    <div class="announcement-message" id="event-msg-{{ e.id }}">
+                                        <div class="truncated-box" id="truncated-{{ e.id }}">{{ e.description[:180] }}</div>
+                                        <div class="full-text" id="full-{{ e.id }}" aria-hidden="true">{{ e.description }}</div>
+                                        {% if e.description|length > 180 %}
+                                        <button type="button" class="expand-btn" data-target="event-msg-{{ e.id }}" aria-controls="full-{{ e.id }}" aria-expanded="false">Ver mais</button>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="item-meta">
+                                        {# creation timestamp on the right (where meta lives) #}
+                                        {% if e.createdAt_fmt %}
+                                            <div class="muted-text"><small>{{ e.createdAt_fmt }}</small></div>
+                                        {% endif %}
+
+                                    {# keep important badge on the right alongside createdAt #}
+                                    {% if e.important %}
+                                    <div class="badges-row">
+                                        {% if e.important %}<span class="badge badge-new" style="background:gold; color: var(--text-secondary);">★ Importante</span>{% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    {% else %}
+                        <li>Não há eventos agendados.</li>
+                    {% endif %}
+                </ul>
+
+                {# Separar as listas em ULs diferentes para evitar a linha/divisor entre eventos e aniversários #}
+                <ul>
+                    {# weekly birthdays (Monday-Sunday) displayed above today's birthdays #}
+
+                    {% if birthdays_today %}
+                        <li class="section-heading" style="list-style:none; padding:0; margin-bottom:0.15rem; border:none;">
+                            <div class="card-top">
+                                <div class="card-top-icon" aria-hidden="true">🎂</div>
+                                <h3>Feliz aniversário!</h3>
+                            </div>
+                        </li>
+                        {% for b in birthdays_today %}
+                        <li style="border:none; padding:0.15rem 0; margin:0;">
+                            <div>{{ b['nome_completo'] }} ({{ b['display'] }})</div>
+                        </li>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if birthdays_week %}
+                        <li class="section-heading" style="list-style:none; padding:0; margin-bottom:0.15rem; border:none;">
+                            <div class="card-top">
+                                <div class="card-top-icon" aria-hidden="true">🎉</div>
+                                <h3>Aniversariantes da semana</h3>
+                            </div>
+                        </li>
+                        {% for b in birthdays_week %}
+                        <li style="border:none; padding:0.15rem 0; margin:0;">
+                            <div>{{ b['nome_completo'] }} ({{ b['display'] }})</div>
+                        </li>
+                        {% endfor %}
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+
+        
+
+    {% if current_user_role == 'admin' %}
+    <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <h3>Total de Voluntários</h3>
+                    <p class="stat-value">{{ total_users }}</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⬆️</div>
+                <div class="stat-content">
+                    <h3>Entradas Hoje</h3>
+                    <p class="stat-value">{{ today_in }}</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⬇️</div>
+                <div class="stat-content">
+                    <h3>Saídas Hoje</h3>
+                    <p class="stat-value">{{ today_out }}</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <h3>Total de Registros</h3>
+                    <p class="stat-value">{{ total_entries }}</p>
+                </div>
+            </div>
+        </div>
+        
+    <div class="actions-grid">
+            <a href="{{ url_for('users') }}" class="action-card">
+                <div class="action-icon">👥</div>
+                <h3>Gerenciar Voluntários</h3>
+                <p>Adicionar, editar e remover voluntários do sistema</p>
+            </a>
+            
+            <a href="{{ url_for('clock_entries') }}" class="action-card">
+                <div class="action-icon">🕐</div>
+                <h3>Registros de Ponto</h3>
+                <p>Visualizar e gerenciar registros de entrada/saída</p>
+            </a>
+        </div>
+        {% endif %}
+    
+    {% if current_user_role != 'admin' %}
+        {% set user_acts = (get_user_activities() if get_user_activities is defined else []) %}
+        {% if user_acts %}
+    <section class="form-container wide quick-activities-card" style="margin-top:1rem;">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+                <div class="card-top-icon" aria-hidden="true">🗂️</div>
+                <h3>Registrar atendimentos rápidos</h3>
+            </div>
+            <p class="muted-text">Toque em uma atividade para abrir o formulário rápido de registro.</p>
+            <div class="quick-activities-row">
+                {% for a in user_acts %}
+                <div class="quick-activity-cell">
+                    <a href="{{ url_for('complete_activity', act_id=a.id) }}" class="quick-activity-card">
+                        <div class="quick-activity-left">
+                            <div class="quick-activity-emoji" aria-hidden="true">{{ a.emoji or '🗂️' }}</div>
+                            <div class="quick-activity-info">
+                                <div class="quick-activity-title">{{ a.title }}</div>
+                                <div class="quick-activity-count"><small>{{ a.today_count if a.today_count is defined else 0 }} registros</small></div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    {% endif %}
+
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// removed chart; implement activity toggle behavior below
+    document.addEventListener('DOMContentLoaded', function(){
+    // wire up activity checkboxes
+    document.querySelectorAll('.activity-checkbox').forEach(cb => {
+        cb.addEventListener('change', function(e){
+            const actId = this.dataset.actId;
+            if (!actId) return;
+            fetch(`/activities/toggle/${actId}`, {method: 'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                .then(r => r.json())
+                .then(json => {
+                    if (json && json.status === 'added') showToast('Atividade marcada como concluída', 'success');
+                    else if (json && json.status === 'removed') showToast('Marcação de atividade removida', 'info');
+                })
+                .catch(err => {
+                    console.error('Erro ao atualizar atividade:', err);
+                    showToast('Erro ao atualizar atividade', 'error');
+                });
+        });
+    });
+});
+</script>
+{% endblock %}

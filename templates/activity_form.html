@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Nova Atividade - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main id="main-content" class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>{% if activity %}Editar Atividade{% else %}Nova Atividade{% endif %}</h1>
+                <p>{% if activity %}Atualize os detalhes da atividade{% else %}Crie uma nova atividade e atribua a voluntários{% endif %}</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="title">Título</label>
+                    <input id="title" name="title" class="control" required value="{{ activity.title if activity }}" />
+                </div>
+
+                <div class="form-group">
+                    <label for="hourly_cost">Custo por hora (R$)</label>
+                    <input id="hourly_cost" name="hourly_cost" type="number" step="0.01" class="control" value="{{ activity.hourly_cost if activity and activity.hourly_cost is defined else 0.0 }}" />
+                    <div class="muted-text">Valor hora para o serviço correspondente — usado para calcular o valor economizado por atividade.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descrição</label>
+                    <textarea id="description" name="description" class="control" rows="4">{{ activity.description if activity }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Sessão</label>
+                                        <div class="muted-text" style="margin-top:0.4rem;">Escolha a categoria que melhor identifica esta atividade e em qual sessão ela deve ser mostrada. Caso não selecione, atividade aparecerá em geral.</div>
+                    <select id="primary_section" name="primary_section" class="control" style="margin-bottom:0.5rem;">
+                        <option value="">--</option>
+                        <option value="Atendimento" {% if activity and activity.primary_section == 'Atendimento' %}selected{% endif %}>Atendimento</option>
+                        <option value="Integração" {% if activity and activity.primary_section == 'Integração' %}selected{% endif %}>Integração</option>
+                        <option value="Cuidando de quem cuida" {% if activity and activity.primary_section == 'Cuidando de quem cuida' %}selected{% endif %}>Cuidando de quem cuida</option>
+                        <option value="Grupo de Palhaços" {% if activity and activity.primary_section == 'Grupo de Palhaços' %}selected{% endif %}>Grupo de Palhaços</option>
+                        <option value="Projetos Parceiros" {% if activity and activity.primary_section == 'Projetos Parceiros' %}selected{% endif %}>Projetos Parceiros</option>
+                        <option value="Geral Voluntários" {% if activity and activity.primary_section == 'Geral Voluntários' %}selected{% endif %}>Geral Voluntários</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Atendimentos</label>
+                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.35rem;">
+                        <label style="display:flex; align-items:center; gap:0.35rem;"><input type="checkbox" name="report_metrics" value="pacientes" {% if activity and activity.report_metrics and ('pacientes' in activity.report_metrics) %}checked{% endif %}/> Pacientes Atendidos</label>
+                        <label style="display:flex; align-items:center; gap:0.35rem;"><input type="checkbox" name="report_metrics" value="acompanhantes" {% if activity and activity.report_metrics and ('acompanhantes' in activity.report_metrics) %}checked{% endif %}/> Acompanhantes Atendidos</label>
+                        <label style="display:flex; align-items:center; gap:0.35rem;"><input type="checkbox" name="report_metrics" value="colaboradores" {% if activity and activity.report_metrics and ('colaboradores' in activity.report_metrics) %}checked{% endif %}/> Colaboradores Atendidos</label>
+                        <label style="display:flex; align-items:center; gap:0.35rem;"><input type="checkbox" id="report_metrics_outro" name="report_metrics" value="outro" {% if activity and activity.report_metrics and ('outro' in activity.report_metrics) %}checked{% endif %}/> Outro (especificar)</label>
+                    </div>
+                    {% if activity and (activity.report_metrics and ('outro' in activity.report_metrics) or activity.report_metrics_custom) %}
+                        <input id="report_metrics_custom" name="report_metrics_custom" class="control" placeholder="Ex.: Médicos atendidos" style="margin-top:0.5rem; display:block;" value="{{ activity.report_metrics_custom if activity }}" />
+                    {% else %}
+                        <input id="report_metrics_custom" name="report_metrics_custom" class="control" placeholder="Ex.: Médicos atendidos"style="margin-top:0.5rem; display:none;" value="" />
+                    {% endif %}
+                    <div class="muted-text" style="margin-top:0.35rem;">Marque quais contagens esta atividade gera no relatório (algumas atividades têm múltiplas linhas).</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="unit_scope">Unidade</label>
+                    <select id="unit_scope" name="unit_scope" class="control">
+                        <option value="">--</option>
+                        <option value="UTI 1" {% if activity and activity.unit_scope == 'UTI 1' %}selected{% endif %}>UTI 1</option>
+                        <option value="UTI 2" {% if activity and activity.unit_scope == 'UTI 2' %}selected{% endif %}>UTI 2</option>
+                        <option value="UTI 3" {% if activity and activity.unit_scope == 'UTI 3' %}selected{% endif %}>UTI 3</option>
+                        <option value="UTI 4" {% if activity and activity.unit_scope == 'UTI 4' %}selected{% endif %}>UTI 4</option>
+                        <option value="Outro" {% if activity and activity.unit_scope == 'Outro' %}selected{% endif %}>Outro (especificar)</option>
+                    </select>
+                    {% if activity and activity.unit_scope == 'Outro' %}
+                        <input id="unit_scope_custom" name="unit_scope_custom" class="control" placeholder="Ex.: UTI Pediatria, Enfermaria X" style="margin-top:0.5rem; display:block;" value="{{ activity.unit_scope_custom if activity }}" />
+                    {% else %}
+                        <input id="unit_scope_custom" name="unit_scope_custom" class="control" placeholder="Ex.: UTI Pediatria, Enfermaria X" style="margin-top:0.5rem; display:none;" value="{{ activity.unit_scope_custom if activity }}" />
+                    {% endif %}
+                    <div class="muted-text" style="margin-top:0.35rem;">Caso a atividade ocorra em um local que deve ser quebrado por unidade (ex.: UTI1/UTI2), selecione aqui ou escolha "Outro" para especificar.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="allow_multiple">Permitir marcações múltiplas por dia</label>
+                    <div style="margin-top:0.35rem;">
+                        <label style="display:flex; align-items:center; gap:0.6rem;">
+                        <input type="checkbox" id="allow_multiple" name="allow_multiple" value="1" {% if activity and activity.allow_multiple %}checked{% endif %} />
+                        <span class="muted-text" style="margin-left:0.5rem; font-weight:400;">Se marcado, o voluntário poderá registrar múltiplas ocorrências no mesmo dia e informar quantos atendimentos daquele tipo realizou.</span>
+                    </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('activities') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const loc = document.getElementById('location');
+    const locCustom = document.getElementById('location_custom');
+    const reportMetricsOutro = document.getElementById('report_metrics_outro');
+    const reportMetricsCustom = document.getElementById('report_metrics_custom');
+    function toggleCustom(){
+        if (!loc || !locCustom) return;
+        if (loc.value === 'Outro') locCustom.style.display = 'block';
+        else locCustom.style.display = 'none';
+    }
+    if (loc){
+        loc.addEventListener('change', toggleCustom);
+        toggleCustom();
+    }
+    if (reportMetricsOutro && reportMetricsCustom){
+        function toggleReportMetricsCustom(){
+            reportMetricsCustom.style.display = reportMetricsOutro.checked ? 'block' : 'none';
+        }
+        reportMetricsOutro.addEventListener('change', toggleReportMetricsCustom);
+        toggleReportMetricsCustom();
+    }
+    // keep SQL-compatible field 'nome' in sync with visible 'title'
+    const titleVisible = document.getElementById('title');
+    if (titleVisible){
+        // create hidden input for SQL name if not present
+        if (!document.getElementById('sql_nome_activity')){
+            const h = document.createElement('input');
+            h.type = 'hidden'; h.id = 'sql_nome_activity'; h.name = 'nome'; h.value = titleVisible.value || '';
+            document.querySelector('form').appendChild(h);
+        }
+        const sqlNome = document.getElementById('sql_nome_activity');
+        titleVisible.addEventListener('input', () => { if (sqlNome) sqlNome.value = titleVisible.value; });
+    }
+
+    // filter assigned list as user types (uses data attributes on each item)
+    const assignedSearch = document.getElementById('assigned_search');
+    const assignedContainer = document.getElementById('assigned_container');
+    if (assignedSearch && assignedContainer){
+        assignedSearch.addEventListener('input', function(){
+            const q = (assignedSearch.value || '').toLowerCase().trim();
+            document.querySelectorAll('#assigned_container .assigned-item').forEach(item => {
+                const name = (item.getAttribute('data-name') || '') || '';
+                const username = (item.getAttribute('data-username') || '') || '';
+                const match = !q || name.includes(q) || username.includes(q);
+                item.style.display = match ? '' : 'none';
+            });
+        });
+    }
+    // toggle custom unit scope input
+    const unitScope = document.getElementById('unit_scope');
+    const unitScopeCustom = document.getElementById('unit_scope_custom');
+    function toggleUnitScopeCustom(){
+        if (!unitScope || !unitScopeCustom) return;
+        if (unitScope.value === 'Outro') unitScopeCustom.style.display = 'block';
+        else unitScopeCustom.style.display = 'none';
+    }
+    if (unitScope){
+        unitScope.addEventListener('change', toggleUnitScopeCustom);
+        toggleUnitScopeCustom();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Aviso - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>{{ 'Editar Aviso' if announcement else 'Adicionar Aviso' }}</h1>
+                <p>Publique uma mensagem rápida para todos os voluntários</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="title">Título</label>
+                    <input id="title" name="title" class="control" required value="{{ announcement.title if announcement }}">
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensagem</label>
+                    <textarea id="message" name="message" class="control" rows="4" required>{{ announcement.message if announcement }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="important">
+                        <input type="checkbox" id="important" name="important" value="1" {% if announcement and announcement.important %}checked{% endif %}>
+                        Marcar como importante (aparece destacadamente no dashboard)
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <a href="{{ url_for('announcements') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

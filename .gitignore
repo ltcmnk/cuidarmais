@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+.venv-new/
+venv/
+env/
+
+# Local runtime/state
+logs/
+pids/
+backups/
+*.pid
+*.log
+audit.log
+
+# Local data files
+# Keep production/sample data out of git by default
+data.json
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

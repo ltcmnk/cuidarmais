@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Registros de Ponto - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Registros de Ponto</h1>
+                <p>Histórico de entrada e saída</p>
+            </div>
+            {% if current_user_role == 'admin' %}
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+                <a href="{{ url_for('add_clock_entry') }}" class="btn-primary">+ Adicionar Registro</a>
+
+                <div class="export-dropdown">
+                    <button type="button" class="btn-secondary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>
+                    <div class="export-menu" role="menu" aria-hidden="true">
+                        <button type="button" class="export-item" data-form-id="filter-form" data-format="csv">CSV</button>
+                        <button type="button" class="export-item" data-form-id="filter-form" data-format="xlsx">XLSX</button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </header>
+        
+            <div class="filter-container">
+            <form id="filter-form" class="filter-form" method="GET" action="{{ url_for('clock_entries') }}">
+                {% if current_user_role == 'admin' %}
+                <input class="search-input" type="search" name="q" placeholder="Pesquisar voluntários" value="{{ q if q else '' }}">
+                {% endif %}
+                <label for="start_date">De</label>
+                <input class="date-input" type="date" id="start_date" name="start_date" value="{{ start_date if start_date else '' }}">
+                <label for="end_date">Até</label>
+                <input class="date-input" type="date" id="end_date" name="end_date" value="{{ end_date if end_date else '' }}">
+                <div class="type-filter-group" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:nowrap;">
+                    <label for="entry_type" style="margin:0; white-space:nowrap;">Tipo</label>
+                    <select id="entry_type" name="type" class="control entry-type-select">
+                        <option value="">Todos</option>
+                        <option value="in" {% if entry_type == 'in' %}selected{% endif %}>Entrada</option>
+                        <option value="out" {% if entry_type == 'out' %}selected{% endif %}>Saída</option>
+                    </select>
+                    <button type="submit" class="btn-primary">Filtrar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Voluntário</th>
+                        <th>Data/Hora</th>
+                        <th>Tipo</th>
+                        <th>Observações</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr data-username="{{ entry.username|e }}" data-cpf="{{ entry.cpf|e }}" data-user-name="{{ entry.userName|e }}">
+                        <td>{{ entry.userName }}</td>
+                        <td>{{ entry.timestamp|shortdate }}</td>
+                        <td>
+                            <span class="badge badge-{{ entry.type }}">
+                                {{ 'Entrada' if entry.type == 'in' else 'Saída' }}
+                            </span>
+                        </td>
+                        <td>{{ entry.notes if entry.notes else '-' }}</td>
+                        <td style="white-space:nowrap;">
+                            {% if current_user_role == 'admin' %}
+                                <a class="btn-secondary" href="{{ url_for('clock.edit_clock_entry', entry_id=entry.id) }}">Editar</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

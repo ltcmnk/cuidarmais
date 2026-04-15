@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar Evento - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>{% if event %}Editar Evento{% else %}Adicionar Evento{% endif %}</h1>
+                <p>Crie ou edite um evento que será mostrado no card de Eventos e aniversários</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST">
+                <!-- Hidden SQL-compatible fields (nome, descrição, data_inicio, data_fim, usuario_idusuario) -->
+                <input type="hidden" id="sql_nome_event" name="nome" value="{{ event.title if event else '' }}">
+                <input type="hidden" id="sql_descricao_event" name="descrição" value="{{ event.description if event else '' }}">
+                <input type="hidden" id="sql_data_inicio" name="data_inicio" value="{{ event.scheduled_at if event else '' }}">
+                <input type="hidden" id="sql_data_fim" name="data_fim" value="{{ event.scheduled_end if event else '' }}">
+                <input type="hidden" id="sql_usuario_id" name="usuario_idusuario" value="{{ current_user_id if current_user_id else '' }}">
+                <div class="form-group">
+                    <label for="title">Título</label>
+                    <input id="title" name="title" class="control" value="{{ event.title if event }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Descrição</label>
+                    <textarea id="description" name="description" class="control" rows="4">{{ event.description if event }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Data e hora (início)</label>
+                    <div class="inline-controls">
+                        <input type="date" id="evt_date" name="date" class="date-input" value="{% if event and event.scheduled_at %}{{ event.scheduled_at.split('T')[0] }}{% endif %}">
+                        <input type="time" id="evt_time" name="time" class="time-input" step="60" value="{% if event and event.scheduled_at %}{{ event.scheduled_at.split('T')[1] if 'T' in event.scheduled_at else '' }}{% endif %}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">Data e hora (fim, opcional)</label>
+                    <div class="inline-controls">
+                        <input type="date" id="evt_end_date" name="end_date" class="date-input" value="{% if event and event.scheduled_end %}{{ event.scheduled_end.split('T')[0] }}{% endif %}">
+                        <input type="time" id="evt_end_time" name="end_time" class="time-input" step="60" value="{% if event and event.scheduled_end %}{{ event.scheduled_end.split('T')[1] if 'T' in event.scheduled_end else '' }}{% endif %}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="location">Local</label>
+                    <input id="location" name="location" class="control" value="{{ event.location if event }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="important">
+                        <input type="checkbox" id="important" name="important" value="1" {% if event and event.important %}checked{% endif %}>
+                        Marcar como importante (aparece no topo do card de Eventos)
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('events') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const title = document.getElementById('title');
+    const sqlNome = document.getElementById('sql_nome_event');
+    if (title && sqlNome) title.addEventListener('input', () => sqlNome.value = title.value);
+
+    const desc = document.getElementById('description');
+    const sqlDesc = document.getElementById('sql_descricao_event');
+    if (desc && sqlDesc) desc.addEventListener('input', () => sqlDesc.value = desc.value);
+
+    function buildDatetime(dateEl, timeEl){
+        if (!dateEl || !timeEl) return '';
+        if (!dateEl.value) return '';
+        return dateEl.value + 'T' + (timeEl.value ? timeEl.value : '00:00:00');
+    }
+
+    const startDate = document.getElementById('evt_date');
+    const startTime = document.getElementById('evt_time');
+    const sqlStart = document.getElementById('sql_data_inicio');
+    const endDate = document.getElementById('evt_end_date');
+    const endTime = document.getElementById('evt_end_time');
+    const sqlEnd = document.getElementById('sql_data_fim');
+
+    function syncDates(){
+        if (sqlStart) sqlStart.value = buildDatetime(startDate, startTime);
+        if (sqlEnd) sqlEnd.value = buildDatetime(endDate, endTime);
+    }
+    [startDate, startTime, endDate, endTime].forEach(el => { if (el) el.addEventListener('change', syncDates); });
+    syncDates();
+
+    // time preset and control buttons
+    Array.from(document.querySelectorAll('button[data-target][data-time]')).forEach(btn => {
+        btn.addEventListener('click', function(){
+            const targetId = btn.getAttribute('data-target');
+            const timeVal = btn.getAttribute('data-time');
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            target.value = timeVal;
+            syncDates();
+        });
+    });
+
+    // now / incr / decr controls for both start and end
+    function adjustTargetMinutes(targetId, delta){
+        const target = document.getElementById(targetId);
+        if (!target) return;
+        // find corresponding date input to preserve date
+        const dateInputId = targetId === 'evt_time' ? 'evt_date' : 'evt_end_date';
+        const dateEl = document.getElementById(dateInputId);
+        // parse existing time or use now
+        let base = new Date();
+        if (dateEl && dateEl.value){
+            const parts = (dateEl.value || '').split('-');
+            base.setFullYear(parseInt(parts[0]||base.getFullYear()));
+            base.setMonth((parseInt(parts[1]|| (base.getMonth()+1)) -1));
+            base.setDate(parseInt(parts[2]|| base.getDate()));
+        }
+        if (target.value){
+            // target.value is HH:MM or maybe HH:MM:SS
+            const tparts = target.value.split(':');
+            base.setHours(parseInt(tparts[0]||0));
+            base.setMinutes(parseInt(tparts[1]||0));
+            base.setSeconds(0);
+        }
+        base.setMinutes(base.getMinutes() + delta);
+        const hh = String(base.getHours()).padStart(2,'0');
+        const mm = String(base.getMinutes()).padStart(2,'0');
+        target.value = `${hh}:${mm}`;
+        syncDates();
+    }
+
+    document.querySelectorAll('.time-now').forEach(btn => btn.addEventListener('click', function(){
+        const target = btn.getAttribute('data-target');
+        const tEl = document.getElementById(target);
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2,'0');
+        const mm = String(now.getMinutes()).padStart(2,'0');
+        if (tEl) tEl.value = `${hh}:${mm}`;
+        syncDates();
+    }));
+
+    document.querySelectorAll('.time-incr').forEach(btn => btn.addEventListener('click', function(){
+        const target = btn.getAttribute('data-target');
+        const sel = document.querySelector(`.time-step[data-target="${target}"]`);
+        const step = sel ? parseInt(sel.value||15,10) : 15;
+        adjustTargetMinutes(target, step);
+    }));
+
+    document.querySelectorAll('.time-decr').forEach(btn => btn.addEventListener('click', function(){
+        const target = btn.getAttribute('data-target');
+        const sel = document.querySelector(`.time-step[data-target="${target}"]`);
+        const step = sel ? parseInt(sel.value||15,10) : 15;
+        adjustTargetMinutes(target, -step);
+    }));
+
+    // on submit ensure hidden fields are up to date
+    const form = document.querySelector('form');
+    if (form) form.addEventListener('submit', syncDates);
+});
+</script>
+{% endblock %}

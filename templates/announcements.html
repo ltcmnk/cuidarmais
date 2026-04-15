@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Avisos - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Avisos</h1>
+                <p>Mensagens e comunicados para os voluntários</p>
+            </div>
+            {% if current_user_role == 'admin' %}
+            <a href="{{ url_for('add_announcement') }}" class="btn-primary">+ Adicionar Aviso</a>
+            {% endif %}
+        </header>
+
+        <div class="table-container">
+            {% if announcements %}
+            <table class="data-table announcements-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Mensagem</th>
+                        <th>Autor</th>
+                        <th>Data</th>
+                        {% if current_user_role == 'admin' %}
+                        <th>Ações</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in announcements %}
+                    <tr data-ann-id="{{ a.id }}" data-ann-author="{{ a.authorName }}" data-ann-pub="{{ a.createdAt|shortdate }}">
+                        <td>
+                            {% if a.title|length > 50 %}
+                            <strong class="truncated-text" id="title-{{ a.id }}">{{ a.title[:50] }}</strong>
+                            <strong class="full-text" id="full-title-{{ a.id }}">{{ a.title }}</strong>
+                            {% else %}
+                            <strong>{{ a.title }}</strong>
+                            {% endif %}
+                            <div class="badges-row">
+                                {% if a.important %}
+                                    <span class="badge-circle-important" title="Importante" aria-hidden="true">★</span>
+                                    <span class="sr-only">Aviso marcado como importante</span>
+                                {% endif %}
+                                {% if a.is_new %}
+                                    <span class="badge-circle-new" title="Novo" aria-hidden="true">●</span>
+                                    <span class="sr-only">Aviso marcado como novo</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                            <td class="muted-text">
+                            <div class="announcement-message" id="announcement-msg-{{ a.id }}">
+                                {# If message is long, show truncated preview + full text and a "Ver mais" control; otherwise render full message inline. #}
+                                {% if a.message and a.message|length > 255 %}
+                                    <div class="truncated-box" id="truncated-{{ a.id }}">{{ a.message[:255] }}</div>
+                                    <div class="full-text" id="full-{{ a.id }}" aria-hidden="true">{{ a.message }}</div>
+                                    <button type="button" class="expand-btn" data-target="announcement-msg-{{ a.id }}" aria-controls="full-{{ a.id }}" aria-expanded="false">Ver mais</button>
+                                {% else %}
+                                    <div class="full-text" id="full-{{ a.id }}">{{ a.message }}</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>{{ a.authorName }}</td>
+                        <td>{{ a.createdAt|shortdate }}</td>
+                        {% if current_user_role == 'admin' %}
+                        <td>
+                            <div class="action-buttons">
+                                <form method="GET" action="{{ url_for('edit_announcement', ann_id=a.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn-small btn-edit">Editar</button>
+                                </form>
+                                <form method="GET" action="{{ url_for('delete_announcement', ann_id=a.id) }}" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aviso?');">
+                                    <button type="submit" class="btn-small btn-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state" style="padding:1.25rem;">
+                <p>Não há avisos publicados.</p>
+                {% if current_user_role == 'admin' %}
+                <div style="margin-top:1rem;">
+                    <a href="{{ url_for('add_announcement') }}" class="btn-primary">+ Adicionar Aviso</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <div id="announcement-modal-backdrop" class="modal-backdrop" aria-hidden="true" style="display:none;">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="announcement-modal-title">
+        <header class="modal-header">
+            <div>
+                <h2 id="announcement-modal-title">&nbsp;</h2>
+                <div class="modal-meta"><span id="announcement-modal-author"></span> <span id="announcement-modal-pub" style="color:var(--text-secondary);"></span></div>
+            </div>
+            <button class="modal-close" aria-label="Fechar" onclick="closeAnnouncementModal()">×</button>
+        </header>
+        <div class="modal-body" id="announcement-modal-body">&nbsp;</div>
+    </div>
+</div>
+{% endblock %}

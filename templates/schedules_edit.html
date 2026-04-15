@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Escala - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Editar Escala</h1>
+                <p>Atualize horário e dia da escala</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="user_id">Voluntário</label>
+                    <select id="user_id" name="user_id" class="control">
+                        {% for u in users %}
+                        <option value="{{ u.id }}" {% if u.id == sched.userId %}selected{% endif %}>{{ (u.nome_completo or u.nome) }} ({{ u.username }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="day">Dia</label>
+                    <select id="day" name="day" class="control">
+                        <option value="seg" {% if sched.day=='seg' %}selected{% endif %}>2ª feira</option>
+                        <option value="ter" {% if sched.day=='ter' %}selected{% endif %}>3ª feira</option>
+                        <option value="qua" {% if sched.day=='qua' %}selected{% endif %}>4ª feira</option>
+                        <option value="qui" {% if sched.day=='qui' %}selected{% endif %}>5ª feira</option>
+                        <option value="sex" {% if sched.day=='sex' %}selected{% endif %}>6ª feira</option>
+                        <option value="sab" {% if sched.day=='sab' %}selected{% endif %}>Sábado</option>
+                        <option value="dom" {% if sched.day=='dom' %}selected{% endif %}>Domingo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="start">Início</label>
+                    <input id="start" name="start" type="time" class="control" value="{{ sched.start }}">
+                </div>
+                <div class="form-group">
+                    <label for="end">Fim</label>
+                    <input id="end" name="end" type="time" class="control" value="{{ sched.end }}">
+                </div>
+                <div class="form-actions">
+                    <a href="{{ url_for('users.schedules') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

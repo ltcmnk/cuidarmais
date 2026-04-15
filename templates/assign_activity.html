@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Atribuir Voluntários - Cuidar+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    {% include '_sidebar.html' %}
+    <main id="main-content" class="main-content">
+        <header class="content-header">
+            <div>
+                <h1>Atribuir voluntários: {{ activity.title }}</h1>
+                <p>Selecione os voluntários que devem receber esta atividade (marque múltiplos).</p>
+            </div>
+        </header>
+
+        <div class="form-container">
+            <form method="POST" action="{{ url_for('activities.assign_activity', act_id=activity.id) }}">
+                <div class="form-group">
+                    <label for="assigned_search">Pesquisar voluntários</label>
+                    <input id="assigned_search" type="search" class="control" placeholder="Filtrar por nome ou usuário" />
+                </div>
+
+                <div id="assign_container" class="assigned-list" style="margin-top:0.5rem;">
+                    {% for u in users %}
+                        {% set assigned_obj = (activity.assigned_to | selectattr('user_id','equalto', u.id) | list) if activity and activity.assigned_to else [] %}
+                        {% set is_assigned = assigned_obj and assigned_obj[0] and not assigned_obj[0]['removed_at'] %}
+                        <label style="display:block; margin-bottom:0.4rem;" data-name="{{ (u.nome or '')|lower }}" data-username="{{ (u.username or '')|lower }}">
+                            <input type="checkbox" name="assigned" value="{{ u.id }}" {% if is_assigned %}checked{% endif %}/> {{ u.nome }}{% if u.username %} ({{ u.username }}){% endif %}
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions" style="margin-top:1rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+                    <a href="{{ url_for('activities.activities') }}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-primary">Salvar atribuições</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const search = document.getElementById('assigned_search');
+    const container = document.getElementById('assign_container');
+    if (!search || !container) return;
+    search.addEventListener('input', function(){
+        const q = (this.value || '').toLowerCase().trim();
+        container.querySelectorAll('label').forEach(lbl => {
+            const name = (lbl.getAttribute('data-name') || '') || '';
+            const username = (lbl.getAttribute('data-username') || '') || '';
+            const match = !q || name.includes(q) || username.includes(q);
+            lbl.style.display = match ? 'block' : 'none';
+        });
+    });
+});
+</script>
+{% endblock %}
