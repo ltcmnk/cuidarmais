@@ -6,7 +6,7 @@
 <div class="layout">
     {% include '_sidebar.html' %}
 
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>Registrar Crachá</h1>
@@ -15,15 +15,15 @@
         </header>
 
         <div class="form-container">
-            <form method="GET" action="{{ url_for('register_badge') }}" style="display:flex; gap:.5rem; margin-bottom:1rem;">
-                <input type="search" name="q" class="control" placeholder="Pesquisar por nome ou usuário" value="{{ q if q }}" style="flex:1;">
+            <form method="GET" action="{{ url_for('users.register_badge') }}" class="badge-search-form">
+                <input type="search" name="q" class="control" placeholder="Pesquisar por nome ou usuário" value="{{ q if q }}">
                 <button class="btn-primary">Pesquisar</button>
             </form>
 
             <form method="POST">
                 <div class="form-group">
                     <label for="user_id">Voluntário</label>
-                    <div style="display:flex; gap:0.5rem; flex-direction:column;">
+                    <div class="datalist-stack">
                         <input list="users-datalist-rb" id="rb_user_search" class="control" placeholder="Comece a digitar para filtrar e escolher" aria-label="Filtrar voluntários">
                         <datalist id="users-datalist-rb">
                             {% for u in users %}
@@ -38,7 +38,7 @@
                     <input id="codigo_cracha" name="codigo_cracha" required>
                 </div>
                 <div class="form-actions">
-                    <a href="{{ url_for('dashboard') }}" class="btn-secondary">Cancelar</a>
+                    <a href="{{ url_for('main.home') }}" class="btn-secondary">Cancelar</a>
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
             </form>

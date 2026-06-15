@@ -20,17 +20,17 @@
                     <input id="assigned_search" type="search" class="control" placeholder="Filtrar por nome ou usuário" />
                 </div>
 
-                <div id="assign_container" class="assigned-list" style="margin-top:0.5rem;">
+                <div id="assign_container" class="assigned-list">
                     {% for u in users %}
                         {% set assigned_obj = (activity.assigned_to | selectattr('user_id','equalto', u.id) | list) if activity and activity.assigned_to else [] %}
                         {% set is_assigned = assigned_obj and assigned_obj[0] and not assigned_obj[0]['removed_at'] %}
-                        <label style="display:block; margin-bottom:0.4rem;" data-name="{{ (u.nome or '')|lower }}" data-username="{{ (u.username or '')|lower }}">
+                        <label data-name="{{ (u.nome or '')|lower }}" data-username="{{ (u.username or '')|lower }}">
                             <input type="checkbox" name="assigned" value="{{ u.id }}" {% if is_assigned %}checked{% endif %}/> {{ u.nome }}{% if u.username %} ({{ u.username }}){% endif %}
                         </label>
                     {% endfor %}
                 </div>
 
-                <div class="form-actions" style="margin-top:1rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+                <div class="form-actions">
                     <a href="{{ url_for('activities.activities') }}" class="btn-secondary">Cancelar</a>
                     <button type="submit" class="btn-primary">Salvar atribuições</button>
                 </div>

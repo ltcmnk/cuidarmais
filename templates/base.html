@@ -3,48 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cuidar+ — Sistema de Gestão de Voluntários do Hospital Cajuru">
     <title>{% block title %}Cuidar+{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {# Aplica tema antes do paint para evitar flash de tema errado #}
     <script>
-        // Prefer to apply theme ASAP to avoid flash: read stored pref and set data-theme before CSS paints
         (function(){
             try {
                 var pref = localStorage.getItem('cuidar_theme_pref');
                 if (pref === 'light' || pref === 'dark') {
                     document.documentElement.setAttribute('data-theme', pref);
-                } else {
-                    // leave unset to allow prefers-color-scheme
                 }
             } catch(e){}
         })();
     </script>
 </head>
 <body>
-    <button class="sidebar-toggle" aria-label="Menu" title="Menu">☰</button>
-        {% block content %}{% endblock %}
+    <a href="#main-content" class="skip-to-content">Pular para o conteúdo principal</a>
+    <button class="sidebar-toggle" aria-label="Abrir menu" title="Menu">☰</button>
 
-        <!-- Flash messages: unified single style, fixed at bottom for cleaner UX -->
-        <div id="flash-container" class="flash-container" aria-live="polite" aria-atomic="true" role="status">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, msg in messages %}
-                        {# Normalize category to choose icon (keep base .flash style unified) #}
-                        {% set kind = 'info' %}
-                        {% if category in ['success','ok','activated','activated_user'] %}
-                            {% set kind = 'success' %}
-                        {% elif category in ['error','danger','fail','failure'] %}
-                            {% set kind = 'error' %}
-                        {% elif category in ['warning','warn'] %}
-                            {% set kind = 'warning' %}
-                        {% endif %}
-                        <div class="flash flash--{{ kind }}" role="status">
-                            <span class="flash-icon" aria-hidden="true">{% if kind=='success' %}✓{% elif kind=='warning' %}⚠{% elif kind=='error' %}⚠{% else %}ℹ{% endif %}</span>
-                            <div class="flash-message">{{ msg }}</div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+    {% block content %}{% endblock %}
+
+    {# Flash messages do servidor — fixo no canto inferior direito #}
+    <div id="flash-container" class="flash-container" aria-live="polite" aria-atomic="true" role="status">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    {% set kind = 'info' %}
+                    {% if category in ['success','ok','activated','activated_user'] %}
+                        {% set kind = 'success' %}
+                    {% elif category in ['error','danger','fail','failure'] %}
+                        {% set kind = 'error' %}
+                    {% elif category in ['warning','warn'] %}
+                        {% set kind = 'warning' %}
+                    {% endif %}
+                    <div class="flash flash--{{ kind }}" role="alert">
+                        <span class="flash-icon" aria-hidden="true">{% if kind=='success' %}✓{% elif kind=='error' %}⚠{% elif kind=='warning' %}⚠{% else %}ℹ{% endif %}</span>
+                        <div class="flash-message">{{ msg }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    {# Modal de confirmação global (ações destrutivas) — usado em qualquer template via JS #}
+    <div id="confirm-modal-backdrop" class="modal-backdrop" aria-hidden="true" style="display:none;">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+            <header class="modal-header">
+                <h2 id="confirm-modal-title">Confirmação</h2>
+                <button class="modal-close" aria-label="Fechar" onclick="window.closeConfirmModal && window.closeConfirmModal()">×</button>
+            </header>
+            <div class="modal-body" id="confirm-modal-body">
+                Tem certeza que deseja prosseguir?
+            </div>
+            <footer class="modal-footer">
+                <button id="confirm-cancel" class="btn-secondary">Cancelar</button>
+                <button id="confirm-ok" class="btn-danger">Confirmar</button>
+            </footer>
         </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/page-scripts.js') }}"></script>

@@ -6,7 +6,7 @@
 <div class="layout">
     {% include '_sidebar.html' %}
     
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>{{ 'Editar' if user else 'Adicionar' }} Voluntário</h1>
@@ -41,7 +41,7 @@
                 <form method="POST">
                      {% set user = intent if intent else (user if user else {}) %}
                 <!-- URL for AJAX username check (keeps Jinja out of JS blocks) -->
-                <input type="hidden" id="check_username_url" value="{{ url_for('check_username') }}">
+                <input type="hidden" id="check_username_url" value="{{ url_for('users.check_username') }}">
                 <div class="form-group">
                     <label for="hospital">Hospital de preferência</label>
                     <select id="hospital" name="hospital" class="control">
@@ -315,7 +315,7 @@
                     {% endif %}
                 </div>
                 <div class="form-actions">
-                    <a href="{{ url_for('users') }}" class="btn-secondary">Cancelar</a>
+                    <a href="{{ url_for('users.users') }}" class="btn-secondary">Cancelar</a>
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
                 </form>
@@ -329,7 +329,7 @@
                             <label for="username">Nome de Usuário</label>
                             <input type="text" id="username" name="username" class="control" value="{{ user.username if user else '' }}" required>
                             <div id="username-feedback" class="field-feedback" aria-live="polite">{% if field_errors and field_errors.get('username') %}{{ field_errors.get('username') }}{% endif %}</div>
-                            <input type="hidden" id="check_username_url" value="{{ url_for('check_username') }}">
+                            <input type="hidden" id="check_username_url" value="{{ url_for('users.check_username') }}">
                             <input type="hidden" id="current_user_id" value="{{ user.id if user and user.id else (user.get('id') if user and user.get('id') else '') }}">
                         </div>
                         <div class="form-group">
@@ -341,7 +341,7 @@
                             <input type="password" id="password_confirm" name="password_confirm" class="control">
                         </div>
                         <div class="form-actions">
-                            <a href="{{ url_for('home') }}" class="btn-secondary">Cancelar</a>
+                            <a href="{{ url_for('main.home') }}" class="btn-secondary">Cancelar</a>
                             <button type="submit" class="btn-primary">Salvar</button>
                         </div>
                     </form>

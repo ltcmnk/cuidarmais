@@ -5,7 +5,7 @@
 {% block content %}
 <div class="layout">
     {% include '_sidebar.html' %}
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>Escalas</h1>
@@ -14,8 +14,8 @@
         </header>
 
         <div class="form-container">
-            <form method="POST" action="{{ url_for('users.add_schedule') }}" style="display:flex; gap:0.5rem; align-items:end; flex-wrap:wrap;">
-                <div style="flex:1; min-width:200px;">
+            <form method="POST" action="{{ url_for('users.add_schedule') }}" class="schedule-add-form">
+                <div class="schedule-field-wide">
                     <label for="user_id">Voluntário</label>
                     <select id="user_id" name="user_id" class="control" required>
                         <option value="">-- escolha --</option>
@@ -50,19 +50,19 @@
             </form>
         </div>
 
-        <section style="margin-top:1rem;">
+        <section class="schedules-existing">
             <h3>Escalas existentes</h3>
             {% if schedules %}
             <div class="table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Voluntário</th>
-                            <th>Dia</th>
-                            <th>Início</th>
-                            <th>Fim</th>
-                            <th>Horas esta semana</th>
-                            <th>Ações</th>
+                            <th scope="col">Voluntário</th>
+                            <th scope="col">Dia</th>
+                            <th scope="col">Início</th>
+                            <th scope="col">Fim</th>
+                            <th scope="col">Horas esta semana</th>
+                            <th scope="col">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,9 +84,11 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <form method="POST" action="{{ url_for('users.delete_schedule', sched_id=s.id) }}" onsubmit="return confirm('Remover escala?');" style="display:inline;">
-                                    <button type="submit" class="btn-small btn-danger">Remover</button>
-                                </form>
+                                <div class="action-buttons">
+                                    <form method="POST" action="{{ url_for('users.delete_schedule', sched_id=s.id) }}" class="confirm-action" data-confirm-message="Remover escala?">
+                                        <button type="submit" class="btn-small btn-danger">Remover</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}

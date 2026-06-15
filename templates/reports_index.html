@@ -6,7 +6,7 @@
 <div class="layout">
     {% include '_sidebar.html' %}
 
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>Relatórios</h1>
@@ -26,16 +26,16 @@
             <!-- Presences card -->
             <div class="form-container wide">
                 <h3>Presenças</h3>
-                <form id="form-presences" method="GET" action="{{ url_for('clock_entries') }}" style="display:flex; flex-direction:column; gap:0.75rem;">
+                <form id="form-presences" method="GET" action="{{ url_for('clock.clock_entries') }}" class="report-form">
                     <div class="card-row">
                         <input list="users-datalist" id="user-search-presences" class="control" placeholder="Comece a digitar para filtrar usuários">
                         <input type="hidden" name="user_id" id="user-id-presences" value="">
                         <input type="hidden" name="report" value="csv">
                     </div>
 
-                    <div class="card-row date-row" style="align-items:center;">
-                        <label style="display:flex; gap:0.5rem; align-items:center;">Início <input type="date" name="start_date" class="control"></label>
-                        <label style="display:flex; gap:0.5rem; align-items:center;">Fim <input type="date" name="end_date" class="control"></label>
+                    <div class="card-row date-row">
+                        <label class="date-label">Início <input type="date" name="start_date" class="control"></label>
+                        <label class="date-label">Fim <input type="date" name="end_date" class="control"></label>
                     </div>
                     <div class="card-actions">
                         <div class="export-dropdown">
@@ -58,15 +58,15 @@
             <!-- Hours card -->
             <div class="form-container wide">
                 <h3>Horas Trabalhadas</h3>
-                <form id="form-hours" method="GET" action="{{ url_for('report_hours') }}" style="display:flex; flex-direction:column; gap:0.75rem;">
+                <form id="form-hours" method="GET" action="{{ url_for('reports.report_hours') }}" class="report-form">
                     <div class="card-row date-row">
                         <input list="users-datalist" id="user-search-hours" class="control" placeholder="Comece a digitar para filtrar usuários">
                         <input type="hidden" name="user_id" id="user-id-hours" value="">
                     </div>
 
                     <div class="card-row date-row">
-                        <label style="display:flex; gap:0.5rem; align-items:center;">Início <input type="date" name="start_date" class="control"></label>
-                        <label style="display:flex; gap:0.5rem; align-items:center;">Fim <input type="date" name="end_date" class="control"></label>
+                        <label class="date-label">Início <input type="date" name="start_date" class="control"></label>
+                        <label class="date-label">Fim <input type="date" name="end_date" class="control"></label>
                         <div>
                             <input type="hidden" name="user_id" id="user-id-hours-bottom" value="">
                         </div>
@@ -94,9 +94,9 @@
             <!-- Activity report card (moved below the others) -->
             <div class="form-container wide activity-report">
                 <h3>Relatório por Atividade</h3>
-                <form id="form-activity-report" method="GET" action="{{ url_for('report_activity_completions') }}" style="display:flex; flex-direction:column; gap:0.75rem;">
+                <form id="form-activity-report" method="GET" action="{{ url_for('reports.report_activity_completions') }}" class="report-form">
                     <div class="card-row">
-                        <label style="flex:1 1 auto;">
+                        <label class="report-label-flex">
                             Atividade
                             <select id="activity-select" name="activity_id" class="control">
                                 <option value="">— Selecione uma atividade —</option>
@@ -105,17 +105,17 @@
                                 {% endfor %}
                             </select>
                         </label>
-                        <label style="flex:1 1 auto;">
+                        <label class="report-label-flex">
                             Voluntário
                             <input list="activity-users-datalist" id="activity-user-search" class="control" placeholder="Comece a digitar para filtrar usuários">
                             <input type="hidden" name="user_id" id="activity-user-id" value="">
                         </label>
                     </div>
 
-                    <div class="card-row date-row" style="align-items:center;">
-                        <label style="display:flex; gap:0.5rem; align-items:center;">Início <input type="date" name="start_date" class="control"></label>
-                        <label style="display:flex; gap:0.5rem; align-items:center;">Fim <input type="date" name="end_date" class="control"></label>
-                        <label style="display:flex; gap:0.5rem; align-items:center; margin-left:1rem;"><input type="checkbox" name="include_value" value="1" /> Incluir valor economizado</label>
+                    <div class="card-row date-row">
+                        <label class="date-label">Início <input type="date" name="start_date" class="control"></label>
+                        <label class="date-label">Fim <input type="date" name="end_date" class="control"></label>
+                        <label class="date-label" style="margin-left:1rem;"><input type="checkbox" name="include_value" value="1" /> Incluir valor economizado</label>
                         <div class="card-actions">
                             <div class="export-dropdown">
                                 <button type="button" class="btn-primary export-toggle" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>

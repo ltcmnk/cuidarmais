@@ -1,4 +1,3 @@
-```md
 # 🏥 Cuidar+
 
 Sistema web desenvolvido em **Flask** para gestão completa de voluntários, atividades e operações administrativas do Hospital Cajuru.
@@ -10,6 +9,32 @@ Sistema web desenvolvido em **Flask** para gestão completa de voluntários, ati
 O **Cuidar+** centraliza a rotina de voluntariado em uma plataforma web intuitiva e administrativa, permitindo o gerenciamento eficiente de usuários, atividades, eventos e comunicação interna.
 
 O sistema foi projetado para melhorar a organização, rastreabilidade e tomada de decisão em ambientes com grande fluxo de voluntários.
+
+---
+
+## 📸 Telas
+
+<details>
+<summary><strong>Ver capturas de tela do sistema</strong></summary>
+
+<br>
+
+| | |
+|:---:|:---:|
+| **Login** | **Dashboard — Administrador** |
+| <img src="docs/screenshots/01_login.png" width="680"> | <img src="docs/screenshots/02_dashboard_admin.png" width="680"> |
+| **Dashboard — Voluntário** | **Gestão de Voluntários** |
+| <img src="docs/screenshots/12_dashboard_voluntario.png" width="680"> | <img src="docs/screenshots/03_usuarios.png" width="680"> |
+| **Controle de Ponto** | **Atividades** |
+| <img src="docs/screenshots/04_controle_ponto.png" width="680"> | <img src="docs/screenshots/05_atividades.png" width="680"> |
+| **Avisos** | **Eventos** |
+| <img src="docs/screenshots/06_avisos.png" width="680"> | <img src="docs/screenshots/07_eventos.png" width="680"> |
+| **Escalas** | **Candidatos a Voluntário** |
+| <img src="docs/screenshots/09_escalas.png" width="680"> | <img src="docs/screenshots/08_candidatos.png" width="680"> |
+| **Relatórios** | **Formulário Público de Intenção** |
+| <img src="docs/screenshots/10_relatorios.png" width="680"> | <img src="docs/screenshots/11_intencao_publica.png" width="680"> |
+
+</details>
 
 ---
 
@@ -201,12 +226,10 @@ O sistema utiliza `data.json` como armazenamento local.
 
 * **[Letícia Miniuk Rosa Pereira](https://github.com/ltcmnk)**
 * **[Rayssa Gaievicz Grafetti](https://github.com/T-800-888)**
-* **Victor Willian Rodrigues Bittencourt**
+* **[Victor Willian Rodrigues Bittencourt](https://github.com/scourgeyyy)**
 
 ---
 
 ## 📌 Status do Projeto
 
 🚧 Em desenvolvimento
-
-```

@@ -11,9 +11,9 @@
                 <h1>Painel de Controle</h1>
                 <p>Visão geral — destaque para notificações e ações rápidas</p>
             </div>
-            <div style="display:flex; gap:1rem; align-items:center;">
-                <div class="last-punch">Último ponto: <strong>{{ last_punch if last_punch else 'Nenhum registro' }}</strong></div>
-                <form method="POST" action="{{ url_for('toggle_clock_entry') }}">
+            <div class="header-actions">
+                <span class="last-punch">Último ponto: <strong>{{ last_punch if last_punch else 'Nenhum registro' }}</strong></span>
+                <form method="POST" action="{{ url_for('clock.toggle_clock_entry') }}">
                     <button type="submit" class="btn-primary">Registrar {{ next_quick }}</button>
                 </form>
             </div>
@@ -45,7 +45,7 @@
                                     <div class="muted-text"><small>{{ a.createdAt|shortdate }}</small></div>
                                     {% if a.important or a.is_new %}
                                     <div class="badges-row">
-                                        {% if a.important %}<span class="badge badge-new" style="background:gold; color: var(--text-secondary);">★ Importante</span>{% endif %}
+                                        {% if a.important %}<span class="badge badge-important">★ Importante</span>{% endif %}
                                         {% if a.is_new %}<span class="badge badge-new">● Novo</span>{% endif %}
                                     </div>
                                     {% endif %}
@@ -115,7 +115,7 @@
                                     {# keep important badge on the right alongside createdAt #}
                                     {% if e.important %}
                                     <div class="badges-row">
-                                        {% if e.important %}<span class="badge badge-new" style="background:gold; color: var(--text-secondary);">★ Importante</span>{% endif %}
+                                        {% if e.important %}<span class="badge badge-important">★ Importante</span>{% endif %}
                                     </div>
                                     {% endif %}
                                 </div>
@@ -132,30 +132,26 @@
                     {# weekly birthdays (Monday-Sunday) displayed above today's birthdays #}
 
                     {% if birthdays_today %}
-                        <li class="section-heading" style="list-style:none; padding:0; margin-bottom:0.15rem; border:none;">
+                        <li class="section-heading">
                             <div class="card-top">
                                 <div class="card-top-icon" aria-hidden="true">🎂</div>
                                 <h3>Feliz aniversário!</h3>
                             </div>
                         </li>
                         {% for b in birthdays_today %}
-                        <li style="border:none; padding:0.15rem 0; margin:0;">
-                            <div>{{ b['nome_completo'] }} ({{ b['display'] }})</div>
-                        </li>
+                        <li class="birthday-entry">{{ b['nome_completo'] }} ({{ b['display'] }})</li>
                         {% endfor %}
                     {% endif %}
 
                     {% if birthdays_week %}
-                        <li class="section-heading" style="list-style:none; padding:0; margin-bottom:0.15rem; border:none;">
+                        <li class="section-heading">
                             <div class="card-top">
                                 <div class="card-top-icon" aria-hidden="true">🎉</div>
                                 <h3>Aniversariantes da semana</h3>
                             </div>
                         </li>
                         {% for b in birthdays_week %}
-                        <li style="border:none; padding:0.15rem 0; margin:0;">
-                            <div>{{ b['nome_completo'] }} ({{ b['display'] }})</div>
-                        </li>
+                        <li class="birthday-entry">{{ b['nome_completo'] }} ({{ b['display'] }})</li>
                         {% endfor %}
                     {% endif %}
 
@@ -201,13 +197,13 @@
         </div>
         
     <div class="actions-grid">
-            <a href="{{ url_for('users') }}" class="action-card">
+            <a href="{{ url_for('users.users') }}" class="action-card">
                 <div class="action-icon">👥</div>
                 <h3>Gerenciar Voluntários</h3>
                 <p>Adicionar, editar e remover voluntários do sistema</p>
             </a>
             
-            <a href="{{ url_for('clock_entries') }}" class="action-card">
+            <a href="{{ url_for('clock.clock_entries') }}" class="action-card">
                 <div class="action-icon">🕐</div>
                 <h3>Registros de Ponto</h3>
                 <p>Visualizar e gerenciar registros de entrada/saída</p>
@@ -218,8 +214,8 @@
     {% if current_user_role != 'admin' %}
         {% set user_acts = (get_user_activities() if get_user_activities is defined else []) %}
         {% if user_acts %}
-    <section class="form-container wide quick-activities-card" style="margin-top:1rem;">
-            <div style="display:flex; align-items:center; gap:0.6rem;">
+    <section class="form-container wide quick-activities-card">
+            <div class="card-header-row">
                 <div class="card-top-icon" aria-hidden="true">🗂️</div>
                 <h3>Registrar atendimentos rápidos</h3>
             </div>
@@ -227,7 +223,7 @@
             <div class="quick-activities-row">
                 {% for a in user_acts %}
                 <div class="quick-activity-cell">
-                    <a href="{{ url_for('complete_activity', act_id=a.id) }}" class="quick-activity-card">
+                    <a href="{{ url_for('activities.activities') }}#act-{{ a.id }}" class="quick-activity-card">
                         <div class="quick-activity-left">
                             <div class="quick-activity-emoji" aria-hidden="true">{{ a.emoji or '🗂️' }}</div>
                             <div class="quick-activity-info">

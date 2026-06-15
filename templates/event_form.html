@@ -6,7 +6,7 @@
 <div class="layout">
     {% include '_sidebar.html' %}
 
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>{% if event %}Editar Evento{% else %}Adicionar Evento{% endif %}</h1>
@@ -57,7 +57,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ url_for('events') }}" class="btn-secondary">Cancelar</a>
+                    <a href="{{ url_for('events.events') }}" class="btn-secondary">Cancelar</a>
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
             </form>

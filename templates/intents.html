@@ -5,7 +5,7 @@
 {% block content %}
 <div class="layout">
     {% include '_sidebar.html' %}
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>Candidatos</h1>
@@ -18,13 +18,13 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Nome</th>
-                        <th>RG</th>
-                        <th>CPF</th>
-                        <th>Celular</th>
-                        <th>E-mail</th>
-                        <th>Endereço</th>
-                        <th>Ações</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">RG</th>
+                        <th scope="col">CPF</th>
+                        <th scope="col">Celular</th>
+                        <th scope="col">E-mail</th>
+                        <th scope="col">Endereço</th>
+                        <th scope="col">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,11 +69,11 @@
                         <td>{{ i.endereco|truncate(60) }}</td>
                         <td>
                             <div class="action-buttons">
-                                <button type="button" class="btn-small btn-secondary" onclick="openIntentModal('{{ i.idintencao }}')">Ver mais</button>
-                                <form method="POST" action="{{ url_for('approve_intent', intent_id=i.idintencao) }}" style="display:inline;">
+                                <button type="button" class="btn-small" onclick="openIntentModal('{{ i.idintencao }}')">Ver mais</button>
+                                <form method="POST" action="{{ url_for('intents.approve_intent', intent_id=i.idintencao) }}">
                                     <button type="submit" class="btn-small btn-primary">Aprovar</button>
                                 </form>
-                                <form method="POST" action="{{ url_for('delete_intent', intent_id=i.idintencao) }}" style="display:inline;" onsubmit="return confirm('Remover inscrição?');">
+                                <form method="POST" action="{{ url_for('intents.delete_intent', intent_id=i.idintencao) }}" class="confirm-action" data-confirm-message="Remover esta inscrição? Esta ação não pode ser desfeita.">
                                     <button type="submit" class="btn-small btn-danger">Remover</button>
                                 </form>
                             </div>
@@ -83,25 +83,22 @@
                 </tbody>
             </table>
             {% else %}
-            <div class="empty-state" style="padding:1.25rem;">
+            <div class="empty-state">
                 <p>Não há inscrições pendentes.</p>
             </div>
             {% endif %}
         </div>
     </main>
 </div>
-{% endblock %}
 
-{% block scripts %}
+{# Modal de detalhes do candidato #}
 <div id="intent-modal-backdrop" class="modal-backdrop" aria-hidden="true" style="display:none;">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="intent-modal-title">
         <header class="modal-header">
             <h2 id="intent-modal-title">&nbsp;</h2>
             <button class="modal-close" aria-label="Fechar" onclick="closeIntentModal()">×</button>
         </header>
-        <div class="modal-body" id="intent-modal-body">
-            <!-- populated by centralized JS -->
-        </div>
+        <div class="modal-body" id="intent-modal-body"></div>
     </div>
 </div>
 {% endblock %}

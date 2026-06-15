@@ -6,7 +6,7 @@
 <div class="layout">
     {% include '_sidebar.html' %}
 
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>{% if entry %}Editar Registro{% else %}Adicionar Registro{% endif %}</h1>
@@ -19,7 +19,7 @@
                 {% if current_user_role == 'admin' %}
                 <div class="form-group">
                     <label for="user_id">Voluntário</label>
-                    <div style="display:flex; gap:0.5rem; flex-direction:column;">
+                    <div class="datalist-stack">
                         <!-- input with datalist for searchable selector -->
                         <input list="users-datalist-clock" id="user_search_select" class="control" placeholder="Comece a digitar para filtrar e escolher" aria-label="Filtrar voluntários">
                         <datalist id="users-datalist-clock">
@@ -30,7 +30,7 @@
                         <!-- hidden user_id will be set from the chosen datalist option -->
                         <input type="hidden" id="user_id" name="user_id" value="{{ entry.userId if entry else '' }}">
                     </div>
-                    <div id="week_warning" style="margin-top:0.5rem; color:var(--warn-color); font-weight:600; display:none;"></div>
+                    <div id="week_warning" class="week-warning" style="display:none;"></div>
                 </div>
                 {% endif %}
 
@@ -52,7 +52,7 @@
                 <div class="form-group">
                     <label for="timestamp">Data e hora</label>
                     <input id="timestamp" name="timestamp" type="datetime-local" class="control" value="{{ entry.timestamp if entry else '' }}">
-                    <div class="muted-text" style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;"></div>
+                    <div class="control-meta-row"></div>
                 </div>
 
                 <div class="form-group">
@@ -61,7 +61,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ url_for('clock_entries') }}" class="btn-secondary">Cancelar</a>
+                    <a href="{{ url_for('clock.clock_entries') }}" class="btn-secondary">Cancelar</a>
                     <button type="submit" class="btn-primary">Salvar</button>
                 </div>
             </form>

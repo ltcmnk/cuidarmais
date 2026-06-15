@@ -1,2213 +1,1217 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* ============================================================
+   CUIDAR+ — Design System
+   Organização: tokens → base → layout → componentes → páginas → responsivo
+   ============================================================ */
+
+/* ============================================================
+   1. DESIGN TOKENS
+   ============================================================ */
 
 :root {
-    /* Light theme (default values) */
-    --bg-primary: #F8FAFC; /* slate-50 */
-    --bg-secondary: #FFFFFF; /* card background */
-    --bg-tertiary: #F1F5F9; /* light surface */
-    --text-primary: #0F172A; /* slate-900 */
-    --text-secondary: #475569; /* slate-600 */
-    /* slightly desaturated blue for calmer visuals */
-    --accent: #2B6CB0; /* softer blue */
-    --accent-hover: #1F5AA3; /* hover state slightly darker */
-    --success: #059669; /* green-600 */
-    --danger: #DC2626; /* red-600 */
-    --border: #E6EEF8; /* subtle border */
-    --muted: #64748B;
-    --control-height: 44px;
-    /* Content max width used to align major grids and cards */
-    --content-max-width: min(1100px, calc(100vw - 4rem));
+    /* Cores — tema claro (padrão) */
+    --bg-primary:   #F8FAFC;  /* fundo geral */
+    --bg-secondary: #FFFFFF;  /* cards, sidebar */
+    --bg-tertiary:  #F1F5F9;  /* inputs, thead */
+    --text-primary:   #0F172A;
+    --text-secondary: #475569;
+    --accent:       #2563EB;  /* azul hospitalar */
+    --accent-hover: #1D4ED8;
+    --success:      #059669;
+    --danger:       #DC2626;
+    --warning:      #D97706;
+    --border:       #E2E8F0;
+    --muted:        #64748B;
+    --shadow-sm:    0 1px 3px rgba(0,0,0,.08);
+    --shadow-md:    0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:    0 8px 24px rgba(0,0,0,.10);
+
+    /* Geometria */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --control-h: 44px;      /* altura padrão de inputs e botões */
+    --sidebar-w: 260px;
+    --content-max: min(1100px, calc(100vw - 4rem));
 }
 
-/* Dark theme via prefers-color-scheme */
+/* Tema escuro explícito */
+html[data-theme="dark"] {
+    --bg-primary:   #071223;
+    --bg-secondary: #0b1826;
+    --bg-tertiary:  #0f2334;
+    --text-primary:   #E6EEF8;
+    --text-secondary: #94A3B8;
+    --accent:       #179997;
+    --accent-hover: #0F8B86;
+    --success:      #06B6D4;
+    --danger:       #F87171;
+    --warning:      #FBBF24;
+    --border:       #1E3448;
+    --muted:        #8EA7BF;
+}
+
+/* Tema escuro pelo sistema */
 @media (prefers-color-scheme: dark) {
     :root {
-        /* match explicit html[data-theme="dark"] variables so system dark and forced dark look identical */
-        --bg-primary: #071223;
+        --bg-primary:   #071223;
         --bg-secondary: #0b1826;
-        --bg-tertiary: #0f2334;
-        --text-primary: #E6EEF8;
-        --text-secondary: #B8CCD9;
-        --accent: #179997;
+        --bg-tertiary:  #0f2334;
+        --text-primary:   #E6EEF8;
+        --text-secondary: #94A3B8;
+        --accent:       #179997;
         --accent-hover: #0F8B86;
-        --success: #06B6D4;
-        --danger: #F87171;
-        --border: #122633;
-        --muted: #8EA7BF;
-    }
-
-    /* ensure buttons are styled consistently in system dark mode too */
-    .btn-secondary {
-        background: rgba(255,255,255,0.03);
-        color: var(--text-primary);
-        border: 1px solid rgba(255,255,255,0.06);
-    }
-    .btn-primary {
-        background: var(--accent);
-        color: white;
-    }
-    .btn-small {
-        background: rgba(255,255,255,0.02);
-        color: var(--text-primary);
-        border: 1px solid rgba(255,255,255,0.04);
+        --success:      #06B6D4;
+        --danger:       #F87171;
+        --warning:      #FBBF24;
+        --border:       #1E3448;
+        --muted:        #8EA7BF;
     }
 }
 
-/* FINAL OVERRIDE: normalize Announcements "Ver mais" to match other action buttons
-   (btn-small / btn-edit visual pattern) and center it below the message on desktop.
-   This block is placed at the end so it wins over earlier conflicting rules. */
-.announcements-table .announcement-message .expand-btn {
-    display: inline-block !important;
-    margin: 0.5rem auto 0 auto !important;
-    padding: 0.45rem 0.9rem !important;
-    background: transparent !important;
-    color: var(--text-secondary) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
-    text-decoration: none !important;
-    font-weight: 400 !important;
-    font-size: 0.95rem !important;
-    box-sizing: border-box !important;
-}
-.announcements-table .announcement-message .expand-btn:hover {
-    background: color-mix(in srgb, var(--bg-secondary) 6%, var(--bg-tertiary)) !important;
-    color: var(--text-primary) !important;
-    border-color: color-mix(in srgb, var(--border) 60%, transparent) !important;
-}
-@media (max-width: 700px) {
-    .announcements-table .announcement-message .expand-btn {
-        display: block !important;
-        width: 100% !important;
-        margin: 0.35rem 0 0 0 !important;
-        text-align: left !important;
-    }
+/* ============================================================
+   2. RESET & BASE
+   ============================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* Final normalization: ensure Edit/Delete and other small action buttons exactly
-   match the visual size of the 'Ver mais' control. This forces padding, font-size,
-   line-height and removes any min-height that would make them taller. */
-.action-buttons .btn-edit,
-.action-buttons .btn-small,
-.action-buttons .btn-danger,
-.announcements-table .action-buttons .btn-small,
-.events-table .action-buttons .btn-small {
-    padding: 0.45rem 0.9rem !important; /* same as expand-btn */
-    font-size: 0.95rem !important;
-    line-height: 1.4 !important;
-    min-height: 0 !important; /* remove the var(--control-height) constraint */
-    height: auto !important;
-    box-sizing: border-box !important;
-    border-radius: 8px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+/* transição suave de tema */
+*, *::before, *::after {
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
-/* Keep delete color but same sizing/shape */
-.action-buttons .btn-danger,
-.announcements-table .action-buttons .btn-danger,
-.events-table .action-buttons .btn-danger {
-    background: var(--danger) !important;
-    color: white !important;
-    border: none !important;
+/* interações não devem ter transição (evita delay em hover de botões) */
+button, a, input, select, textarea {
+    transition: background-color 160ms ease, color 160ms ease,
+                border-color 160ms ease, box-shadow 160ms ease,
+                transform 120ms ease, opacity 160ms ease;
 }
 
-@media (max-width: 700px) {
-    .action-buttons .btn-edit,
-    .action-buttons .btn-small,
-    .action-buttons .btn-danger,
-    .announcements-table .action-buttons .btn-small,
-    .events-table .action-buttons .btn-small {
-        display: block !important;
-        width: 100% !important;
-        padding: 0.35rem 0 !important;
-        text-align: left !important;
-    }
-}
-
-/* ==========================================================
-   CONSOLIDATED ACTION BUTTON STYLES (FINAL)
-   - Single source-of-truth for small action controls used across
-     Announcements, Events and Dashboard cards.
-   - Ensures parity for: .expand-btn, .btn-edit, .btn-small, .btn-danger
-   - Placed at EOF with high specificity and !important to override
-     previous scattered rules without removing them (safe cleanup).
-   Success criteria: same padding, font-size, line-height, radius
-   and visual shape across pages; Delete retains semantic color.
-   ==========================================================
-*/
-
-/* Base small-action (non-danger) — matches the 'Ver mais' appearance */
-.announcement-message .expand-btn,
-.announcements-table .announcement-message .expand-btn,
-.events-table .announcement-message .expand-btn,
-.announcements-card .expand-btn,
-.events-table .expand-btn,
-.top-cards .expand-btn,
-.action-buttons .btn-small,
-.action-buttons .btn-edit,
-.btn-edit,
-.btn-small {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0.45rem 0.9rem !important; /* same hit area as Ver mais */
-    font-size: 0.95rem !important;
-    line-height: 1.4 !important;
-    min-height: 0 !important; /* allow padding-driven height */
-    height: auto !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--border) !important;
-    background: transparent !important;
-    color: var(--text-secondary) !important;
-    text-decoration: none !important;
-    box-sizing: border-box !important;
-}
-
-/* Danger variant keeps color but uses same sizing/shape */
-.action-buttons .btn-danger,
-.announcements-table .action-buttons .btn-danger,
-.events-table .action-buttons .btn-danger,
-.btn-danger {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0.45rem 0.9rem !important;
-    font-size: 0.95rem !important;
-    line-height: 1.4 !important;
-    min-height: 0 !important;
-    height: auto !important;
-    border-radius: 8px !important;
-    background: var(--danger) !important;
-    color: #fff !important;
-    border: none !important;
-    box-sizing: border-box !important;
-}
-
-/* Hover and focus visual parity */
-.announcement-message .expand-btn:hover,
-.action-buttons .btn-small:hover,
-.action-buttons .btn-edit:hover {
-    background: color-mix(in srgb, var(--bg-secondary) 6%, var(--bg-tertiary)) !important;
-    color: var(--text-primary) !important;
-    border-color: color-mix(in srgb, var(--border) 60%, transparent) !important;
-}
-.action-buttons .btn-danger:hover {
-    filter: brightness(0.95) !important;
-}
-.announcement-message .expand-btn:focus-visible,
-.action-buttons .btn-small:focus-visible,
-.action-buttons .btn-edit:focus-visible,
-.action-buttons .btn-danger:focus-visible {
-    outline: none !important;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent) !important;
-}
-
-/* Mobile: full-width tappable controls */
-@media (max-width: 700px) {
-    .announcement-message .expand-btn,
-    .announcements-table .announcement-message .expand-btn,
-    .events-table .announcement-message .expand-btn,
-    .action-buttons .btn-small,
-    .action-buttons .btn-edit,
-    .action-buttons .btn-danger,
-    .btn-small,
-    .btn-edit,
-    .btn-danger {
-        display: block !important;
-        width: 100% !important;
-        padding: 0.35rem 0 !important;
-        text-align: left !important;
-        box-sizing: border-box !important;
-    }
-}
-
-/* End of consolidated action button styles */
-
-
-
-
-/* Make Edit and Delete buttons match the "Ver mais" small-button pattern
-   used in Announcements/Events: same padding, radius and border on desktop;
-   keep semantic danger color for delete. On mobile these become full-width
-   tappable controls. High-specificity block at EOF so it overrides prior rules. */
-.action-buttons .btn-edit,
-.announcements-table .action-buttons .btn-small,
-.events-table .action-buttons .btn-small,
-.top-cards .action-buttons .btn-small {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0.45rem 0.9rem !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--border) !important;
-    background: transparent !important;
-    color: var(--text-secondary) !important;
-    font-size: 0.95rem !important;
-    box-sizing: border-box !important;
-}
-
-/* Keep Delete visually semantic but match sizing/shape */
-.action-buttons .btn-danger,
-.announcements-table .action-buttons .btn-danger,
-.events-table .action-buttons .btn-danger {
-    padding: 0.45rem 0.9rem !important;
-    border-radius: 8px !important;
-    background: var(--danger) !important;
-    color: white !important;
-    border: none !important;
-    font-size: 0.95rem !important;
-    box-sizing: border-box !important;
-}
-
-/* Hover states: subtle lift or color change to match announcement expand button */
-.action-buttons .btn-edit:hover,
-.announcements-table .action-buttons .btn-small:hover,
-.events-table .action-buttons .btn-small:hover {
-    background: color-mix(in srgb, var(--bg-secondary) 6%, var(--bg-tertiary)) !important;
-    color: var(--text-primary) !important;
-    border-color: color-mix(in srgb, var(--border) 60%, transparent) !important;
-}
-.action-buttons .btn-danger:hover { filter: brightness(0.95) !important; }
-
-@media (max-width: 700px) {
-    .action-buttons .btn-edit,
-    .action-buttons .btn-small,
-    .action-buttons .btn-danger,
-    .announcements-table .action-buttons .btn-small,
-    .events-table .action-buttons .btn-small {
-        display: block !important;
-        width: 100% !important;
-        text-align: left !important;
-        padding: 0.35rem 0 !important;
-        box-sizing: border-box !important;
-    }
-}
-
-/* === Announcements "Ver mais" — use the same small rounded button pattern as the
-   FINAL OVERRIDE so it visually matches Events and Dashboard. This replaces the
-   previous link-like variant which caused inconsistent sizing. */
-.announcements-table td:nth-child(2) .announcement-message .expand-btn,
-.announcements-table .announcement-message .expand-btn {
-    display: inline-block !important;
-    margin: 0.5rem auto 0 auto !important;
-    padding: 0.45rem 0.9rem !important;
-    background: transparent !important;
-    color: var(--text-secondary) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
-    text-decoration: none !important;
-    font-weight: 400 !important;
-    font-size: 0.95rem !important;
-    box-sizing: border-box !important;
-}
-
-@media (max-width: 700px) {
-    .announcements-table td:nth-child(2) .announcement-message .expand-btn,
-    .announcements-table .announcement-message .expand-btn {
-        display: block !important;
-        width: 100% !important;
-        margin: 0.35rem 0 0 0 !important;
-        text-align: left !important;
-        padding: 0.35rem 0 !important;
-    }
-}
-
-/* Explicit forced themes */
-html[data-theme="light"] {
-    --bg-primary: #F8FAFC;
-    --bg-secondary: #FFFFFF;
-    --bg-tertiary: #F1F5F9;
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
-    --accent: #2563EB;
-    --accent-hover: #1D4ED8;
-    --success: #059669;
-    --danger: #DC2626;
-    --border: #E6EEF8;
-    --muted: #64748B;
-}
-
-html[data-theme="dark"] {
-    --bg-primary: #071223;
-    --bg-secondary: #0b1826;
-    --bg-tertiary: #0f2334;
-    --text-primary: #E6EEF8;
-    --text-secondary: #B8CCD9;
-    /* Slightly muted teal for dark mode (calmer than bright green) */
-    --accent: #179997; /* muted teal */
-    --accent-hover: #0F8B86;
-    /* success (used for badges/positive states) changed to a blue-cyan so green buttons are not dominant in dark theme */
-    --success: #06B6D4; /* cyan */
-    --danger: #F87171;
-    --border: #122633;
-    --muted: #8EA7BF;
-}
+html { scroll-behavior: smooth; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
+    font-size: 1rem;
 }
 
-/* smooth color transitions for theme changes */
-* {
-    transition: background-color 160ms ease-in-out, color 160ms ease-in-out, border-color 160ms ease-in-out;
-}
+img, svg { display: block; max-width: 100%; }
 
-/* Login Page */
-.login-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 1rem;
-}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-.login-box {
-    background: linear-gradient(180deg, var(--bg-secondary), color-mix(in srgb, var(--bg-secondary) 92%, var(--bg-tertiary)) );
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 3rem;
-    width: 100%;
-    max-width: 400px;
-}
+h1, h2, h3, h4 { line-height: 1.25; }
 
-.login-box h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    text-align: center;
-}
+/* ============================================================
+   3. ACESSIBILIDADE
+   ============================================================ */
 
-.subtitle {
-    color: var(--text-secondary);
-    text-align: center;
-    margin-bottom: 2rem;
+.skip-to-content {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    padding: .5rem 1rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    font-weight: 600;
+    z-index: 9999;
+    text-decoration: none;
 }
+.skip-to-content:focus { top: 0; outline: 3px solid #fff; outline-offset: 2px; }
 
-.error-message {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    padding: 0.75rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-}
-
-.demo-info {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-/* small flag above inputs (used on login page) */
-.input-flag {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    text-transform: none; /* keep original casing */
-    letter-spacing: 0.01em;
-    font-weight: 400; /* regular weight, not bold */
-    display: block;
-}
-
-/* Ensure login form groups stack label/flag above inputs */
-.login-box .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-}
-.login-box .form-group .control {
-    margin-top: 0; /* inputs sit below flags */
-}
-.sr-only { /* keep accessible label for screen readers */
+.sr-only {
     position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
+    width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important;
+    overflow: hidden !important; clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important; border: 0 !important;
 }
 
-/* Filter container UX improvements (Clock entries page) */
-.filter-container {
-    /* centered, comfortable filter area that avoids forcing overflow */
-    margin: 0 auto 1rem auto;
-    width: min(960px, calc(100vw - 4rem));
-    max-width: 960px;
-    padding: 0.70rem 1rem;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.035);
-    background: var(--bg-secondary);
-    box-sizing: border-box;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-}
-.filter-form {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    flex-wrap: wrap; /* allow wrapping on small screens */
-}
-.filter-form .search-input {
-    flex: 1 1 clamp(180px, 28vw, 420px);
-    min-width: 140px;
-    max-width: 720px;
-    padding: 0.5rem 0.75rem;
-    height: var(--control-height);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-}
-.filter-form .date-input {
-    flex: 0 1 120px;
-    min-width: 110px;
-    padding: 0 0.5rem;
-    height: var(--control-height);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-}
-.filter-form .control {
-    height: var(--control-height);
-    padding: 0 0.75rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-}
-.type-filter-group {
-    /* Force the type controls onto their own line so label/select/button sit together below other controls */
-    display: flex !important;
-    gap: 0.35rem;
-    align-items: center;
-    /* make this group occupy a full row and allow internal wrapping if needed */
-    flex: 1 1 100% !important;
-    min-width: 0;
-    white-space: nowrap;
+/* foco visível global */
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
-.type-filter-group label {
-    margin: 0 0.25rem 0 0;
-}
-.type-filter-group .entry-type-select {
-    /* slightly larger select so the Filtrar button still fits comfortably */
-    flex: 0 0 160px;
-    min-width: 140px;
-    max-width: 180px;
-}
-.type-filter-group .btn-primary {
-    flex: 0 0 auto;
-}
-.entry-type-select {
-    min-width: 110px;
-    max-width: 180px;
-}
-.filter-form .btn-primary {
-    height: var(--control-height);
-    padding: 0 0.75rem;
-}
+/* ============================================================
+   4. LAYOUT
+   ============================================================ */
 
-@media (max-width: 700px) {
-    .filter-form { gap: 0.5rem; }
-    .filter-form .search-input { flex-basis: 100%; }
-    .filter-form .date-input { flex: 0 0 48%; min-width: 100px; }
-    .type-filter-group { width: 100%; justify-content: flex-start; }
-
-    /* On small screens ensure badges keep icon next to label (no wrapping) */
-    .badges-row .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        white-space: nowrap; /* keep icon and label on same line */
-        padding: 0.16rem 0.45rem;
-        font-size: 0.85rem;
-    }
-
-    /* reduce gap for compact mobile layout */
-    .badges-row {
-        gap: 0.25rem;
-    }
-    .type-filter-group .entry-type-select { flex: 1 1 auto; margin-right: 0.5rem; }
-    /* make the filter button visible but not overly large on mobile */
-    .type-filter-group .btn-primary { flex: 0 0 auto; }
-}
-
-/* Wide screens: keep all filter controls on single line */
-@media (min-width: 1200px) {
-    .filter-form {
-        flex-wrap: nowrap;
-        align-items: center;
-    }
-    .filter-form .search-input {
-        flex: 1 1 450px;
-        min-width: 350px;
-    }
-    .filter-form .date-input {
-        flex: 0 0 160px;
-        min-width: 140px;
-    }
-    .entry-type-select {
-        min-width: 120px;
-        flex: 0 0 auto;
-    }
-    .type-filter-group {
-        flex: 0 0 auto;
-    }
-    .filter-form .btn-primary {
-        flex: 0 0 auto;
-    }
-}
-
-@media (min-width: 1000px) and (max-width:1199px) {
-    /* medium-large: allow limited wrapping to avoid overflow */
-    .filter-form { flex-wrap: wrap; }
-    .filter-form .search-input { flex: 1 1 300px; min-width: 160px; }
-    .filter-form .date-input { flex: 0 1 120px; }
-    .entry-type-select { min-width: 110px; }
-}
-
-/* Layout */
 .layout {
     display: flex;
     min-height: 100vh;
 }
 
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-x: hidden;
+    min-width: 0; /* evita overflow em flex */
+}
+
+/* ============================================================
+   5. SIDEBAR
+   ============================================================ */
+
 .sidebar {
-    width: 280px;
+    width: var(--sidebar-w);
     background: var(--bg-secondary);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-}
-
-/* Keep sidebar visible and scrollable when main content is large */
-.sidebar {
     position: sticky;
     top: 0;
     height: 100vh;
-    align-self: flex-start;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-shrink: 0;
 }
 
 .sidebar-header {
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border);
 }
-
 .sidebar-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
 }
 
 .sidebar-nav {
     flex: 1;
-    padding: 1rem;
+    padding: .75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
+    gap: .75rem;
+    padding: .65rem 1rem;
     color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    font-size: .95rem;
     text-decoration: none;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    transition: all 0.2s;
 }
-
 .nav-item:hover {
-    background: color-mix(in srgb, var(--accent) 6%, var(--bg-tertiary));
+    background: color-mix(in srgb, var(--accent) 8%, var(--bg-tertiary));
     color: var(--text-primary);
+    text-decoration: none;
 }
-
 .nav-item.active {
-    /* Make active nav subtler (no strong blue) to match design preference) */
-    background: color-mix(in srgb, var(--accent) 6%, var(--bg-tertiary));
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-tertiary));
     color: var(--text-primary);
-    box-shadow: none;
+    font-weight: 500;
 }
 
 .sidebar-footer {
-    padding: 1.25rem;
+    padding: 1rem 1.25rem;
     border-top: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start; /* restore previous alignment so sidebar items don't stretch */
+    gap: .6rem;
 }
 
-.sidebar-footer .footer-actions {
+.user-info { font-weight: 600; font-size: .95rem; }
+
+.footer-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: .5rem;
     align-items: center;
 }
 
+/* botão de toggle de tema */
 .theme-toggle {
-    width: calc(var(--control-height) - 8px);
-    height: calc(var(--control-height) - 8px);
-    padding: 0.25rem;
-    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    padding: .35rem .6rem;
+    border-radius: 999px;
     border: 1px solid var(--border);
     background: var(--bg-tertiary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: .95rem;
+    line-height: 1;
+}
+.theme-toggle:hover { filter: brightness(.95); }
+.theme-toggle .dot {
     display: inline-flex;
+    align-items: center;
+    font-size: 1.05rem;
+}
+
+/* toggle hambúrguer (mobile) */
+.sidebar-toggle {
+    position: fixed;
+    left: 12px; top: 12px;
+    z-index: 1200;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .4rem .6rem;
+    display: none;        /* visível só no mobile via media query */
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: var(--shadow-sm);
 }
+.sidebar-toggle:active { transform: scale(.97); }
 
-.theme-toggle .dot {
-    font-size: 1rem;
-}
+/* ============================================================
+   6. CONTENT HEADER
+   ============================================================ */
 
-.btn-logout {
-    padding: 0 1rem;
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    min-height: calc(var(--control-height) - 8px);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Sidebar toggle button (mobile) */
-.sidebar-toggle {
-    position: fixed;
-    left: 12px;
-    top: 12px;
-    z-index: 1200;
-    background: #ffffff; /* default closed state: white */
-    border: none; /* no contour when closed */
-    border-radius: 8px;
-    padding: 0.4rem 0.6rem;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Smooth transitions and tactile feedback for the toggle */
-.sidebar-toggle {
-    transition: background-color 200ms ease, transform 160ms ease, color 160ms ease, box-shadow 160ms ease;
-    will-change: transform, background-color;
-}
-
-/* Slight press animation and focus accessibility */
-.sidebar-toggle:active { transform: scale(0.985); }
-.sidebar-toggle:focus { outline: none; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 10%, transparent); }
-
-/* Keep hover/focus states for closed toggle white and without contour */
-.sidebar-toggle:hover, .sidebar-toggle:focus, .sidebar-toggle:active {
-    background: #ffffff !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: var(--text-primary) !important;
-}
-
-@media (max-width: 900px) {
-    .sidebar-toggle { display: inline-flex; }
-    /* hide sidebar by default on small screens */
-    .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        transform: translateX(-110%);
-        transition: transform 220ms ease;
-        z-index: 1100;
-        width: 80%;
-        max-width: 320px;
-    }
-    body.sidebar-open .sidebar { transform: translateX(0); }
-    /* dim the page when sidebar open */
-    body.sidebar-open::after {
-        content: '';
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.3);
-        z-index: 1050;
-    }
-    /* ensure main-content has left padding removed on small screens */
-    .main-content { padding-left: 1rem; }
-}
-
-/* When sidebar is open on mobile, visually position the toggle near the sidebar header (to the right of the logo) */
-@media (max-width: 900px) {
-    body.sidebar-open .sidebar-toggle {
-        /* sidebar width is min(80vw, 320px) per CSS; place toggle a bit inset from the right edge */
-        left: calc(min(80vw, 320px) - 56px);
-        top: 16px;
-        z-index: 1150;
-        background: var(--bg-secondary);
-    }
-}
-
-/* Make layout flow vertically on small screens so main content is full-width */
-@media (max-width: 900px) {
-    .layout {
-        display: block;
-    }
-
-    /* main content should not be affected by sidebar width when sidebar is hidden */
-    .main-content {
-        margin-left: 0 !important;
-        width: 100%;
-        padding: 1rem;
-    }
-
-    /* make sidebar positioned above content when opened; otherwise off-canvas */
-    .sidebar {
-        box-shadow: 0 8px 30px rgba(2,6,23,0.12);
-        background: var(--bg-secondary);
-    }
-
-    /* ensure table containers allow horizontal scroll and tables wrap content;
-       align table containers with centered form containers for consistent layout */
-    .table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 0.5rem;
-        /* match width/centering used by .filter-container for visual alignment */
-        width: min(960px, calc(100vw - 4rem));
-        max-width: 100%;
-        margin: 0 auto;
-    }
-
-    .data-table {
-        width: 100%;
-        min-width: 600px; /* allow scroll if many columns */
-        border-collapse: collapse;
-    }
-
-    .data-table th, .data-table td {
-        white-space: normal;
-        word-break: break-word;
-        padding: 0.7rem 0.5rem;
-    }
-
-    /* reduce sidebar footer spacing on small screens */
-    .sidebar-footer { padding: 0.75rem; }
-}
-
-/* Additional responsive adjustments for usability on small screens */
-@media (max-width: 900px) {
-    /* Stack header and actions */
-    .content-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    /* On mobile, reset button margin since they stack below titles */
-    .content-header .btn-primary,
-    .content-header .btn-secondary {
-        margin-top: 0;
-    }
-
-    .content-header form {
-        width: 100%;
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .search-input, .date-input {
-        min-width: 0;
-        width: 100%;
-    }
-
-    .btn-primary, .btn-small {
-        min-width: 120px;
-    }
-
-    .form-actions {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-    }
-
-    .form-actions .btn-primary,
-    .form-actions .btn-secondary,
-    .form-actions .btn-danger {
-        width: 100%;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .action-buttons .btn-small {
-        flex: 1 1 auto;
-    }
-
-    .table-container {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .data-table th, .data-table td {
-        padding: 0.9rem 0.75rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .sidebar-toggle { left: 8px; top: 8px; }
-    .main-content { padding: 1rem; }
-    .stat-value { font-size: 1.4rem; }
-    .search-input, .date-input { height: 40px; }
-    .btn-primary { font-size: 0.95rem; }
-}
-
-/* When viewing the public intention form on small screens we don't want the sidebar toggle shown.
-   The template adds `body.hide-toggle-on-mobile` so we can target it here without touching base.html. */
-@media (max-width: 900px) {
-    body.hide-toggle-on-mobile .sidebar-toggle {
-        display: none !important;
-    }
-}
-
-.user-info {
-    margin-bottom: 1rem;
-}
-
-.main-content {
-    flex: 1;
-    padding: 2rem;
-    overflow-x: auto;
-}
+#main-content { outline: none; }
 
 .content-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-/* Ensure header action group aligns the register button and last-punch text */
-.content-header .header-actions {
-    display: flex;
+    align-items: flex-start;
     gap: 1rem;
-    align-items: center;
+    margin-bottom: 1.75rem;
 }
-
-/* Move only action buttons down to avoid flash notification collision */
-.content-header .btn-primary,
-.content-header .btn-secondary {
-    /* keep actions vertically centered with the header info by default */
-    margin-top: 0;
-}
-
 .content-header h1 {
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
 }
-
 .content-header p {
     color: var(--text-secondary);
+    margin-top: .2rem;
+    font-size: .95rem;
+}
+.content-header .header-actions {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    flex-shrink: 0;
 }
 
-/* Forms */
-.form-group {
-    margin-bottom: 1rem;
-}
+/* ============================================================
+   7. BOTÕES
+   ============================================================ */
 
-.export-dropdown .export-toggle {
-    /* match button sizing used elsewhere */
-    padding: 0 0.9rem;
-    min-height: var(--control-height);
+/* base compartilhada */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-success,
+.btn-small,
+.btn-edit,
+.btn-info,
+.btn-logout {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    border-radius: 8px;
+    justify-content: center;
+    gap: .4rem;
+    padding: 0 1rem;
+    min-height: var(--control-h);
+    border-radius: var(--radius-sm);
+    font-size: .95rem;
+    font-weight: 400;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    white-space: nowrap;
 }
+/* evitar underline em links com classe de botão */
+a.btn:hover, a.btn-primary:hover, a.btn-secondary:hover,
+a.btn-logout:hover, a.btn-small:hover { text-decoration: none; }
+
+/* primário */
+.btn-primary, .btn-info {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.btn-primary:hover, .btn-info:hover { background: var(--accent-hover); }
+
+/* secundário */
+.btn, .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+.btn:hover, .btn-secondary:hover { background: var(--bg-tertiary); }
+
+/* perigo */
+.btn-danger {
+    background: var(--danger);
+    color: #fff;
+}
+.btn-danger:hover { filter: brightness(.9); }
+
+/* sucesso (ativar voluntário) */
+.btn-success {
+    background: var(--success);
+    color: #fff;
+}
+.btn-success:hover { filter: brightness(.9); }
+
+/* logout */
+.btn-logout {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+.btn-logout:hover { background: var(--bg-primary); }
+
+/* pequenos (tabelas, cards) */
+.btn-small, .btn-edit {
+    min-height: 34px;
+    padding: 0 .75rem;
+    font-size: .88rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+.btn-small:hover, .btn-edit:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+/* grupo de ações em tabelas */
+.action-buttons {
+    display: inline-flex;
+    gap: .35rem;
+    align-items: center;
+}
+/* forms dentro de grupos de ação não devem quebrar o layout flex */
+.action-buttons form { display: contents; }
+
+/* estado vazio de tabelas/listas */
+.empty-state {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+.empty-state p { margin-bottom: .5rem; }
+.empty-state-action { margin-top: 1rem; }
+
+/* meta do modal de anúncio */
+.modal-meta {
+    font-size: .85rem;
+    color: var(--text-secondary);
+    margin-top: .2rem;
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   8. FORMULÁRIOS & INPUTS
+   ============================================================ */
+
+.form-group { margin-bottom: 1rem; }
+.form-group label {
+    display: block;
+    margin-bottom: .4rem;
+    font-weight: 600;
+    font-size: .9rem;
+    color: var(--text-primary);
+}
+
+/* todos os controles de formulário compartilham altura e borda */
+.control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="number"],
+select,
+.search-input,
+.date-input,
+.time-input {
+    height: var(--control-h);
+    padding: 0 .75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+textarea.control,
+textarea {
+    min-height: calc(var(--control-h) * 2.5);
+    padding: .65rem .75rem;
+    resize: vertical;
+    height: auto;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    width: 100%;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.control:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* checkboxes e radios */
+input[type="checkbox"],
+input[type="radio"] {
+    width: auto;
+    height: auto;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: .4rem;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+
+/* linha horizontal de controles (data + hora, nome + sobrenome) */
+.inline-controls {
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+}
+.inline-controls > div {
+    display: flex;
+    flex-direction: column;
+}
+.inline-controls > * { min-width: 0; }
+.inline-controls label { margin-bottom: .35rem; }
+.inline-controls .control,
+.inline-controls input,
+.inline-controls select,
+.inline-controls textarea { width: 100%; }
+
+.flex-1 { flex: 1; }
+.narrow { flex: 0 0 130px; }
+
+/* linha com label + controle lado a lado (radio groups) */
+.form-row {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.form-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+/* feedback inline de campo */
+.field-feedback { margin-top: .3rem; font-size: .88rem; color: var(--muted); }
+.field-feedback.error { color: var(--danger); }
+.field-feedback.success { color: var(--success); }
+
+/* input inválido */
+.is-invalid {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 12%, transparent) !important;
+}
+
+/* campo que deveria aparecer condicional mas está oculto */
+.conditional-hidden { display: none; margin-top: .5rem; }
+
+/* ações de etapa (formulário de intenção multi-step) */
+.step-actions { display: flex; gap: .5rem; margin-top: 1rem; justify-content: flex-end; }
+.step-actions--split { justify-content: space-between; }
+
+/* linha de cabeçalho de card com ícone + título */
+.card-header-row { display: flex; align-items: center; gap: .6rem; }
+
+/* ações de formulário */
+.form-actions {
+    display: flex;
+    gap: .75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+/* container de formulário (cards brancos com borda) */
+.form-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+    max-width: 640px;
+    box-shadow: var(--shadow-sm);
+}
+.form-container > h3 {
+    margin-bottom: .75rem;
+    font-size: 1.05rem;
+}
+.form-container.wide {
+    max-width: var(--content-max);
+    width: 100%;
+}
+
+/* centraliza formulários horizontalmente */
+.center-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1.25rem;
+}
+.center-container .form-container {
+    max-width: 900px;
+    width: 100%;
+}
+.center-container .center-inner {
+    width: 100%;
+    max-width: 900px;
+    padding: 0 1rem;
+}
+
+/* formulário de perfil amplo */
+.form-container.wide.profile-wide {
+    max-width: var(--content-max);
+    width: min(1200px, calc(100vw - 4rem));
+    padding: 2rem;
+}
+
+/* lista de voluntários atribuídos a atividades */
+.assigned-list { max-height: 280px; overflow-y: auto; margin-top: .5rem; }
+.assigned-list label { display: block; margin-bottom: .4rem; }
+
+/* grupo de checkboxes inline (ex.: métricas de atividade) */
+.checkbox-group {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+    margin-top: .35rem;
+}
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+/* texto auxiliar abaixo de controles */
+.form-group .muted-text { margin-top: .35rem; }
+
+/* campo condicional toggled via JS — CSS define apenas o espaçamento; display:none fica inline para JS */
+.field-conditional { margin-top: .5rem; }
+
+/* aviso de limite semanal — JS controla display */
+.week-warning { margin-top: .5rem; color: var(--warn-color); font-weight: 600; }
+
+/* row de metadados abaixo de um controle */
+.control-meta-row { margin-top: .5rem; display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+.assigned-item {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    padding: .6rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: .4rem;
+}
+.assigned-item label { margin: 0; font-weight: 400; }
+
+/* disponibilidade (grade de dias) */
+.availability-grid {
+    display: grid;
+    grid-template-columns: 1fr 120px 120px;
+    gap: .5rem;
+    align-items: center;
+}
+.availability-grid-header > div {
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding-bottom: .25rem;
+    font-size: .88rem;
+}
+.availability-row { display: contents; }
+
+/* ============================================================
+   9. ALERTAS INLINE (weekly hour limit, etc.)
+   ============================================================ */
+
+.alert {
+    padding: .65rem 1rem;
+    border-radius: var(--radius-sm);
+    margin: .75rem 0;
+    font-size: .9rem;
+    border: 1px solid;
+}
+.alert-info    { background: color-mix(in srgb, var(--accent) 8%, transparent);  border-color: color-mix(in srgb, var(--accent) 30%, transparent); color: var(--accent); }
+.alert-error   { background: color-mix(in srgb, var(--danger) 8%, transparent);  border-color: color-mix(in srgb, var(--danger) 30%, transparent); color: var(--danger); }
+.alert-warning { background: color-mix(in srgb, var(--warning) 8%, transparent); border-color: color-mix(in srgb, var(--warning) 30%, transparent); color: var(--warning); }
+
+/* ============================================================
+   10. CARDS — stat, action, activity
+   ============================================================ */
+
+/* grid de estatísticas no dashboard (admin) */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+.stat-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    box-shadow: var(--shadow-sm);
+}
+.stat-icon { font-size: 1.75rem; line-height: 1; }
+.stat-content h3 {
+    color: var(--text-secondary);
+    font-size: .8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .35rem;
+}
+.stat-value { font-size: 1.9rem; font-weight: 700; line-height: 1; }
+
+/* grid de ações rápidas no dashboard (admin) */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+.action-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+    display: block;
+}
+.action-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    text-decoration: none;
+}
+.action-icon { font-size: 2rem; margin-bottom: .75rem; }
+.action-card h3 { margin-bottom: .4rem; }
+.action-card p { color: var(--text-secondary); font-size: .875rem; }
+
+/* grid de atividades */
+.activity-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.activity-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.activity-card-title { font-weight: 700; margin-bottom: .2rem; }
+.card-footer, .activity-card-actions {
+    margin-top: .75rem;
+    display: flex;
+    gap: .5rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   11. TOP CARDS (avisos + eventos no dashboard)
+   ============================================================ */
+
+.top-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    align-items: start;
+}
+.announcements-card,
+.birthdays-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.card-top {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: .75rem;
+}
+.card-top h3 { font-weight: 600; font-size: 1rem; margin: 0; }
+.card-top-icon { font-size: 1.4rem; }
+
+/* listas dentro dos cards */
+.announcements-card ul,
+.birthdays-card ul {
+    list-style: none;
+}
+.announcements-card li,
+.birthdays-card li {
+    padding: .6rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: .92rem;
+    position: relative;
+}
+.announcements-card li:last-child,
+.birthdays-card li:last-child { border-bottom: none; }
+.birthdays-card li.section-heading { border: none; padding: 0; margin-bottom: .25rem; }
+.birthdays-card li.birthday-entry { border: none; padding: .12rem 0; }
+
+.compact-item { list-style: none; }
+.card-row { display: flex; gap: .5rem; align-items: flex-start; }
+.item-left { flex: 1; display: flex; flex-direction: column; gap: .05rem; }
+.item-meta {
+    position: absolute;
+    right: 0; top: .6rem;
+    width: 130px;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--text-secondary);
+    font-size: .85rem;
+}
+.title-row { margin-bottom: .05rem; }
+.announcement-title {
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: .92rem;
+}
+.muted-text { color: var(--text-secondary); font-size: .88rem; margin-top: .1rem; }
+
+/* indicador "Novo" (pequeno círculo ao lado do título) */
+.mobile-created { display: none; }
+
+/* ============================================================
+   12. TABELAS
+   ============================================================ */
+
+.table-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-top: .75rem;
+}
+.table-container .data-table { width: 100%; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th,
+.data-table td {
+    padding: .85rem 1rem;
+    text-align: left;
+    vertical-align: middle;
+}
+.data-table thead {
+    background: var(--bg-tertiary);
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text-secondary);
+}
+.data-table tbody tr { border-top: 1px solid var(--border); }
+.data-table tbody tr:hover { background: var(--bg-tertiary); }
+
+/* colunas nomeadas na tabela de usuários */
+.col-name     { width: 28%; }
+.col-username { width: 22%; }
+.col-role     { width: 15%; }
+.col-actions  { width: auto; text-align: right; white-space: nowrap; }
+
+/* ============================================================
+   13. BADGES
+   ============================================================ */
+
+.badge {
+    display: inline-block;
+    padding: .2rem .6rem;
+    border-radius: 9999px;
+    font-size: .8rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+.badge-admin {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+}
+.badge-user {
+    background: color-mix(in srgb, var(--success) 12%, transparent);
+    color: var(--success);
+}
+.badge-new {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--accent);
+}
+.badge-in {
+    background: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
+}
+.badge-out {
+    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    color: var(--danger);
+}
+
+/* badges circulares pequenos (ao lado do título) */
+.badge-circle-new,
+.badge-circle-important {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    font-size: 11px;
+    line-height: 1;
+    margin-left: .4rem;
+    vertical-align: middle;
+}
+.badge-circle-new {
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent);
+}
+.badge-circle-important {
+    background: linear-gradient(180deg, #FFD54D, #F2B705);
+    color: #2B2B1F;
+}
+html[data-theme="dark"] .badge-circle-important {
+    background: linear-gradient(180deg, #E5A800, #C68B00);
+    color: #FFFBEA;
+}
+
+.badge-important {
+    display: inline-block;
+    background: linear-gradient(180deg, #FFF3D6, #FFD580);
+    color: #2B2B1F;
+    padding: .15rem .45rem;
+    border-radius: var(--radius-sm);
+    font-size: .78rem;
+    font-weight: 700;
+    line-height: 1;
+}
+html[data-theme="dark"] .badge-important {
+    background: linear-gradient(180deg, #6b4e00, #8a6400);
+    color: #FFFBEA;
+}
+
+/* override badge inline gold em dark mode */
+html[data-theme="dark"] .badge[style*="background:gold"] {
+    background: linear-gradient(180deg, #b57a00, #8a5a00) !important;
+    color: var(--text-primary) !important;
+}
+
+.badges-row {
+    display: inline-flex;
+    gap: .3rem;
+    align-items: center;
+    margin-top: .1rem;
+}
+
+/* ============================================================
+   14. FLASH MESSAGES (toasts)
+   ============================================================ */
+
+.flash-container,
+#flash-container {
+    position: fixed;
+    right: 1rem; bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .5rem;
+    z-index: 11000;
+    pointer-events: none;
+    max-width: min(420px, calc(100% - 2rem));
+}
+
+.flash {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: .65rem .9rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: .92rem;
+    cursor: pointer;
+}
+
+/* barra lateral colorida */
+.flash::before {
+    content: '';
+    display: block;
+    width: 4px; height: 100%;
+    border-radius: 4px;
+    background: var(--muted);
+    flex-shrink: 0;
+    align-self: stretch;
+}
+.flash--success::before { background: var(--success); }
+.flash--error::before   { background: var(--danger); }
+.flash--warning::before { background: var(--warning); }
+
+.flash-icon {
+    font-size: 1rem;
+    width: 1.2rem;
+    text-align: center;
+    flex-shrink: 0;
+    color: var(--muted);
+}
+.flash--success .flash-icon { color: var(--success); }
+.flash--error   .flash-icon { color: var(--danger); }
+.flash--warning .flash-icon { color: var(--warning); }
+.flash--info    .flash-icon { color: var(--accent); }
+.flash-message  { flex: 1; }
+.flash[hidden]  { display: none; }
+
+/* ============================================================
+   15. MODAIS
+   ============================================================ */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    display: none; /* JS faz display:flex */
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,.45);
+    z-index: 1400;
+}
+.modal {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    width: min(720px, 92vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    display: flex;
+    flex-direction: column;
+}
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.modal-header h2 { font-size: 1.05rem; margin: 0; }
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: .2rem .4rem;
+    border-radius: var(--radius-sm);
+    line-height: 1;
+}
+.modal-close:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.modal-body { padding: 1rem 1.25rem; line-height: 1.55; flex: 1; }
+.modal-footer {
+    display: flex;
+    gap: .5rem;
+    justify-content: flex-end;
+    padding: .75rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   16. FILTROS (barra de busca)
+   ============================================================ */
+
+.filter-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: .75rem 1rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1rem;
+}
+.filter-form {
+    display: flex;
+    gap: .65rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.filter-form .search-input {
+    flex: 1 1 250px;
+    min-width: 160px;
+}
+.filter-form .date-input {
+    flex: 0 1 160px;
+    min-width: 130px;
+    width: auto;
+}
+.filter-form .control,
+.filter-form select {
+    width: auto;
+    min-width: 140px;
+    flex: 0 1 auto;
+}
+.filter-form .btn-primary {
+    flex: 0 0 auto;
+    min-height: var(--control-h);
+}
+
+.type-filter-group {
+    display: flex;
+    gap: .35rem;
+    align-items: center;
+    flex: 1 1 100%;
+}
+.type-filter-group label { margin: 0; white-space: nowrap; }
+.data-table td.nowrap { white-space: nowrap; }
+.type-filter-group .entry-type-select {
+    flex: 0 0 160px;
+    width: auto;
+}
+
+/* pesquisa de crachá */
+.badge-search-form { display: flex; gap: .5rem; margin-bottom: 1rem; }
+.badge-search-form .control { flex: 1; }
+.datalist-stack { display: flex; gap: .5rem; flex-direction: column; }
+
+/* formulários de relatório */
+.report-form { display: flex; flex-direction: column; gap: .75rem; }
+.date-label { display: flex; gap: .5rem; align-items: center; }
+.report-label-flex { flex: 1 1 auto; }
+
+/* dropdown de exportação */
 .export-dropdown { position: relative; display: inline-block; }
+.export-dropdown .export-toggle {
+    min-height: var(--control-h);
+    padding: 0 .9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.export-dropdown .export-toggle:hover { background: var(--bg-tertiary); }
 .export-dropdown .export-menu {
     display: none;
     position: absolute;
-    right: 0;
+    right: 0; top: calc(100% + 4px);
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.12);
-    padding: 0.25rem 0;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: .25rem 0;
     min-width: 9rem;
     z-index: 1500;
 }
 .export-dropdown .export-menu a,
 .export-dropdown .export-menu button {
     display: block;
-    padding: 0.45rem 0.75rem;
     width: 100%;
+    padding: .45rem .75rem;
     text-align: left;
     background: transparent;
     border: none;
     color: var(--text-primary);
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: .92rem;
+    text-decoration: none;
 }
 .export-dropdown .export-menu a:hover,
-.export-dropdown .export-menu button:hover { background: color-mix(in srgb, var(--bg-tertiary) 70%, var(--bg-secondary)); }
-
-/* ensure dropdown does not break layout on small screens */
-@media (max-width: 700px) {
-    .export-dropdown { width: 100%; }
-    .export-dropdown .export-toggle { width: 100%; justify-content: center; }
-    .export-dropdown .export-menu { right: 0; left: 0; min-width: auto; }
-}
-
-/* ensure card actions align buttons uniformly */
-.card-actions { display:flex; gap:0.5rem; align-items:center; justify-content:flex-end; }
-.card-actions .btn-primary, .card-actions .btn-secondary, .card-actions .export-dropdown { min-height: var(--control-height); }
-
-/* Activity groups (reporting) */
-.activity-group { margin-bottom: 1.5rem; }
-.activity-group .group-title { font-size: 1.15rem; margin-bottom: 0.65rem; color: var(--text-primary); }
-.activity-cards-grid { display:flex; gap:0.75rem; flex-wrap:wrap; }
-.activity-card { flex: 1 1 calc(33.333% - 0.75rem); min-width: 220px; box-sizing: border-box; }
-
-@media (max-width: 900px) {
-    .activity-card { flex: 1 1 calc(50% - 0.75rem); }
-}
-@media (max-width: 600px) {
-    .activity-card { flex: 1 1 100%; }
-}
-
-/* Mobile-only: keep activity card footer actions inline and aligned
-   On small screens we generally make buttons full-width, but activity
-   cards include compact action groups (Editar / Voluntários / Remover)
-   that should remain horizontally inline and centered with the card
-   controls (and not expand to full-width). This override targets only
-   action controls inside `.activity-card .card-footer`. */
-@media (max-width: 700px) {
-    .activity-card .card-footer {
-        display: flex !important;
-        flex-wrap: wrap;
-        gap: 0.5rem !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-    }
-    .activity-card .card-footer .btn-small,
-    .activity-card .card-footer .btn-edit,
-    .activity-card .card-footer .btn-danger,
-    .activity-card .card-footer a.btn-small,
-    .activity-card .card-footer button {
-        display: inline-flex !important;
-        width: auto !important;
-        padding: 0.35rem 0.9rem !important;
-        text-align: center !important;
-        box-sizing: border-box !important;
-    }
-}
-
-/* checkbox sizing in forms */
-.form-group input[type="checkbox"],
-.form-inline input[type="checkbox"],
-label input[type="checkbox"] {
-    vertical-align: middle;
-    margin-right: 0.5rem;
-    padding: 0; /* remove input padding for checkboxes */
-    /* make checkbox visually larger while keeping native appearance */
-    transform: scale(1.35);
-    transform-origin: center;
-}
-
-/* Radios should also be compact and inline; previously matched by .form-group input rules making them full-width */
-.form-group input[type="radio"],
-.form-inline input[type="radio"],
-label input[type="radio"] {
-    width: auto;
-    height: auto;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 0.4rem;
-    padding: 0;
-    transform: scale(1.15);
-    transform-origin: center;
-}
-
-/* Unified control styles: search / select / date / time / datetime-local */
-.control,
-input[type="search"],
-input[type="date"],
-input[type="time"],
-input[type="datetime-local"],
-select,
-.search-input,
-.date-input,
-.time-input {
-    height: var(--control-height);
-    min-height: var(--control-height);
-    padding: 0 0.75rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+.export-dropdown .export-menu button:hover {
     background: var(--bg-tertiary);
-    color: var(--text-primary);
-    font-size: 1rem;
-    box-sizing: border-box;
-    -webkit-appearance: none;
-    appearance: none;
 }
 
-/* Inputs inside centered forms should be roomy and full width */
-.center-container .control,
-.center-container .form-group input,
-.center-container .form-group select,
-.center-container .form-group textarea {
-    width: 100%;
-    box-sizing: border-box;
-    height: var(--control-height);
-    padding: 0 1rem;
-}
-
-/* Reduce radio size inside form cards so 'Sim / Não' options don't look oversized */
-.form-container input[type="radio"],
-.center-container input[type="radio"] {
-    transform: scale(1);
-    margin-right: 0.45rem;
-    vertical-align: middle;
-    transform-origin: center;
-}
-
-/* Slightly tighten label spacing for inline radio groups in forms */
-.form-container .form-row label { gap: 0.4rem; font-size: 0.95rem; }
-
-/* Stronger overrides for checkboxes and radios inside user forms — make them compact */
-.form-container input[type="checkbox"],
-.form-container input[type="radio"],
-.center-container input[type="checkbox"],
-.center-container input[type="radio"] {
-    transform: scale(1) !important;
-    width: auto !important;
-    height: auto !important;
-    margin-right: 0.45rem !important;
-    vertical-align: middle !important;
-}
-
-/* For label-wrapped inputs ensure spacing doesn't push layout */
-.form-container .form-row label,
-.center-container .form-row label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.control:focus,
-input[type="search"]:focus,
-input[type="date"]:focus,
-input[type="time"]:focus,
-input[type="datetime-local"]:focus,
-select:focus,
-.search-input:focus,
-.date-input:focus,
-.time-input:focus,
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 10%, transparent);
-}
-
-/* Inline control groups (useful for date + time) */
-.inline-controls {
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-start; /* allow stacked labels without creating uneven gaps */
-}
-
-/* Ensure each child column stacks label above control and shares consistent vertical rhythm */
-.inline-controls > div {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-/* Make narrow columns a stable flex-basis so fields align vertically across rows */
-.narrow {
-    flex: 0 0 140px; /* fixed small column but flexible layout-wise */
-    min-width: 100px;
-}
-
-/* Inputs inside inline-controls should fill their column width */
-.inline-controls .control,
-.inline-controls input,
-.inline-controls select,
-.inline-controls textarea {
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Make textareas inside form containers taller to match the visual density of other controls */
-.form-container textarea,
-.form-container textarea.control {
-    min-height: calc(var(--control-height) * 3); /* roughly 3 rows worth */
-    padding: 0.75rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-tertiary);
-    resize: vertical; /* allow user to expand if desired */
-}
-
-/* Make description/textareas wider on larger screens for better horizontal space */
-.form-container textarea {
-    width: 100%;
-    max-width: 100%;
-}
-
-@media (min-width: 1000px) {
-    .form-container textarea {
-        /* allow a larger readable width up to the content max width */
-        max-width: calc(var(--content-max-width) - 2rem);
-        width: 100%;
-    }
-}
-
-/* City / CEP widths are controlled by the column flex split on `.inline-controls.city-cep`.
-   Remove fixed widths so inputs naturally fill their column (70% / 30%). */
-
-/* Reduce label bottom spacing within inline controls for consistent compact layout */
-.inline-controls label { margin-bottom: 0.35rem; }
-.inline-controls .control,
-.inline-controls input,
-.inline-controls select {
-    flex: 1 1 auto;
-}
-
-/* Conditional helper: hide/show fields without inline styles */
-.conditional-hidden { display: none; }
-
-/* Make inline-controls behave well when labels are stacked: ensure children can shrink */
-.inline-controls > * { min-width: 0; }
-
-/* For the specific city/cep row, split available horizontal space 70%/30% without changing control height */
-.inline-controls.city-cep {
-    /* ensure the row's children stretch to the same height and don't overflow */
-    align-items: stretch;
-}
-.inline-controls.city-cep > .flex-1 {
-    flex: 0 0 70%;
-    max-width: 70%;
-}
-.inline-controls.city-cep > .narrow {
-    flex: 0 0 30%;
-    max-width: 30%;
-}
-
-/* Ensure inputs inside the city-cep row fill their column and don't introduce extra width */
-.inline-controls.city-cep input,
-.inline-controls.city-cep .control {
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Ensure form-row labels don't push inputs on small screens */
-.form-row label { display: inline-flex; align-items: center; margin-right: 0.5rem; gap: 0.4rem; white-space: normal; flex: 0 0 auto; }
-
-.form-row label input[type="radio"],
-.form-row label input[type="checkbox"] {
-    margin-right: 0.25rem;
-    vertical-align: middle;
-    display: inline-block;
-}
-
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-}
-
-/* Make select controls visually match the search input size on larger screens */
-@media (min-width: 700px) {
-    /* Give selects a similar min-width to .search-input so they look balanced in filters */
-    .form-group select,
-    select {
-        min-width: 300px; /* matches .search-input min-width */
-        max-width: 100%;
-        box-sizing: border-box;
-        /* match the search input height for visual parity */
-        height: var(--control-height);
-        padding: 0 0.75rem;
-        display: inline-flex;
-        align-items: center;
-    }
-}
-
-/* On small screens, allow selects to shrink to container width again */
-@media (max-width: 900px) {
-    .form-group select,
-    select {
-        min-width: 0;
-        width: 100%;
-        height: auto;
-        padding: 0.75rem;
-    }
-}
-
-/* Search and date input sizing for admin filters */
-.search-input {
-    min-width: 300px;
-    padding: 0 0.75rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-tertiary);
-    height: var(--control-height);
-    display: inline-flex;
-    align-items: center;
-}
-/* Date inputs specific width adjustment */
-.control[type="date"],
-.date-input {
-    min-width: 180px;
-}
-
-.form-container {
-    background: linear-gradient(180deg, var(--bg-secondary), color-mix(in srgb, var(--bg-secondary) 92%, var(--bg-tertiary)) );
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2.25rem; /* slightly larger padding for comfort */
-    max-width: 640px;
-}
-
-/* Form layout improvements for activity form UI/UX */
-.form-container .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-.form-container .control {
-    width: 100%;
-    max-width: 100%;
-}
-.assigned-list {
-    max-height: 280px;
-    overflow: auto;
-}
-.assigned-item {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    padding: 0.6rem;
-    border-radius: 8px;
-}
-.assigned-item label { margin: 0; }
-.assigned-item .muted-text { margin-top: 0.25rem; }
-
-@media (max-width: 700px) {
-    .form-container { padding: 1rem; max-width: 100%; }
-    .assigned-item { padding: 0.5rem; }
-}
-
-/* Centered form card (used for profile editing) */
-.center-container > .form-container {
-    max-width: 720px; /* comfortable width matching screenshot */
-    width: 100%;
-    padding: 1rem; /* reduced to bring title closer to top */
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(2,6,23,0.06);
-    background: var(--bg-secondary);
-}
-
-/* ensure any nested form-container (for templates that wrap with an inner element)
-   also gets the centered, constrained behavior. This catches the intention form
-   which uses .center-inner between .center-container and .form-container. */
-.center-container .form-container {
-    max-width: 900px;
-    width: 100%;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(2,6,23,0.06);
-    background: var(--bg-secondary);
-}
-
-/* override the generic wide form behavior when the wide form is used inside a
-   center container so it doesn't stretch edge-to-edge */
-.center-container .form-container.wide {
-    max-width: 900px;
-    width: 100%;
-    padding: 1.25rem;
-}
-
-/* Allow profile edit form to use full wide container when explicitly requested.
-   This overrides the default center-container constraints for the profile page. */
-.center-container > .form-container.wide.profile-wide {
-    width: min(1200px, calc(100vw - 4rem));
-    max-width: none;
-    padding: 2rem;
-}
-
-/* Stronger override for profile edit forms in case other rules or wrappers apply.
-   This selector is intentionally more specific to ensure it wins the cascade. */
-.main-content .center-container > .form-container.wide.profile-wide,
-.layout .main-content .center-container > .form-container.wide.profile-wide {
-    width: min(1200px, calc(100vw - 4rem));
-    max-width: none !important;
-    padding: 2rem;
-    margin: 0 auto;
-    box-sizing: border-box;
-}
-
-.center-container > .form-container .form-actions {
-    justify-content: flex-end;
-    gap: 0.75rem;
-}
-
-.center-container > .form-container .form-actions .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    padding: 0.5rem 0.9rem;
-    border-radius: 8px;
-}
-
-.center-container > .form-container .form-actions .btn-primary {
-    padding: 0.5rem 0.9rem;
-    min-width: 88px;
-}
-
-.form-container.wide {
-    /* Stretch to fit the viewport while keeping a comfortable margin and max cap */
-    /* match the standard wide form sizing so the edges align with the top cards */
-    width: min(1200px, calc(100vw - 4rem));
-    max-width: none;
-    padding: 2rem; /* reduced to bring title/button spacing closer */
-    box-sizing: border-box;
-}
-
-/* Specific sizing for filter container (clock entries) to improve UX */
-.filter-container {
-    /* slightly wider than default form-container so filters can sit comfortably on one line */
-    width: min(1100px, calc(100vw - 4rem));
-    max-width: 1100px;
-    margin: 0 auto 1.5rem auto; /* add extra vertical spacing below filter area */
-    padding: 1rem; /* compact padding for filter area */
-    box-shadow: 0 6px 20px rgba(2,6,23,0.04);
-    background: var(--bg-secondary);
-}
-
-@media (max-width: 700px) {
-    .filter-container { width: calc(100vw - 2rem); padding: 0.75rem; }
-}
-
-/* Ensure medium screens don't make the form hug the edges; we keep a small padding via calc above */
-@media (max-width: 700px) {
-    .form-container.wide {
-        width: calc(100vw - 2rem);
-        padding: 1.25rem;
-    }
-}
-
-/* Narrow inputs used in the form (house number, small date/time fields) */
-.narrow {
-    flex: 0 0 120px; /* fixed small column but flexible layout-wise */
-    min-width: 100px;
-}
-
-/* Availability grid used on the intention form */
-.availability-grid {
-    display: grid;
-    grid-template-columns: 1fr 120px 120px;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.availability-grid-header {
-    display: contents;
-}
-.availability-grid-header > div {
-    font-weight: 600;
-    color: var(--text-secondary);
-    padding-bottom: 0.25rem;
-}
-
-.availability-row {
-    display: contents;
-}
-
-@media (max-width: 700px) {
-    .narrow { width: 100%; }
-    /* On small screens, stack each availability row: label full-width, times side-by-side */
-    .availability-grid { grid-template-columns: 1fr; }
-    /* hide header to save vertical space on very small screens */
-    .availability-grid-header { display: none; }
-    .availability-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-items: center; }
-    .availability-row > div:first-child { grid-column: 1 / -1; }
-    .availability-grid input.time-input { width: 100%; }
-}
-
-/* small utility flex helper used in forms */
-.flex-1 { flex: 1; }
-
-/* horizontal row helper for radio groups and small controls */
-.form-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
-
-/* Utility to let list pages use a full-width card visually matching previous layout */
-.form-container.fullwidth {
-    max-width: none;
-    width: 100%;
-    padding: 1.25rem 1.5rem;
-}
-
-/* Ensure anchor buttons align visually with button elements */
-a.btn-primary, a.btn-secondary, a.btn-logout {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--control-height);
-}
-
-/* Generic .btn utility to match old visual style when used on anchors */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 1rem;
-    min-height: var(--control-height);
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text-primary);
-    background: transparent;
-    border: 1px solid var(--border);
-}
-.btn:hover { background: color-mix(in srgb, var(--bg-secondary) 90%, var(--bg-tertiary)); }
-
-/* focus styles for accessibility */
-.btn:focus, .btn-primary:focus, button:focus {
-    outline: 3px solid color-mix(in srgb, var(--accent) 20%, transparent);
-    outline-offset: 2px;
-}
-
-/* Announcements card - full width card */
-.announcements-card,
-.birthdays-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem; /* slightly tighter padding for denser dashboard */
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: background 0.15s ease, transform 0.12s ease;
-    position: relative; /* for absolute meta positioning */
-}
-
-/* Center container to horizontally center cards on pages */
-.center-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin: 0 0 1.25rem 0;
-}
-
-/* inner wrapper used in some long multi-step forms to constrain content width */
-.center-container .center-inner {
-    width: 100%;
-    max-width: 900px; /* match previous inline style used in template */
-    padding: 0 1rem; /* small side padding so inputs don't touch viewport edge */
-    box-sizing: border-box;
-}
-
-/* Slightly lower centered page headers so they don't stick to the top of the viewport */
-.center-container .content-header { margin-top: 1rem; }
-
-/* Step headings spacing inside form cards */
-.form-container .step h3 { margin-top: 0.25rem; margin-bottom: 0.75rem; }
-
-/* Reduce default heading gap inside cards so the title sits closer to the card top */
-.form-container > h3 {
-    margin-top: 0; /* remove default browser top margin */
-    margin-bottom: 0.5rem; /* keep a modest gap after the title */
-    padding-top: 0; /* ensure no extra padding above */
-}
-
-/* Tighten label spacing for uniform look */
-.form-group label { margin-bottom: 0.35rem; }
-
-.announcements-card h3,
-.birthdays-card h3 {
-    margin-bottom: 0.75rem;
-}
-
-.announcements-card ul,
-.birthdays-card ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.announcements-card li,
-.birthdays-card li {
-    padding: 0.6rem 0;
-    /* subtle divider to separate items */
-    border-bottom: 1px solid rgba(0,0,0,0.02);
-    color: var(--text-secondary);
-    display: flex;
-    flex-wrap: wrap; /* allow message blocks to wrap to full-width row */
-    gap: 0.5rem; /* tightened gap between title/meta/message */
-    align-items: flex-start;
-    justify-content: space-between;
-    position: relative; /* allow absolute-positioned meta on right */
-}
-
-.announcements-card li:last-child,
-.birthdays-card li:last-child {
-    border-bottom: none;
-}
-
-.card-icon {
-    width: 28px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-}
-
-/* Ensure announcement messages inside list items span the full card width */
-.announcements-card .announcement-message {
-    flex: 0 0 100%;
-    line-height: 1.45;
-}
-
-.muted-text {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    margin-top: 0.10rem;
-}
-
-/* Birthday header style to highlight the section */
-.birthday-header {
-    color: var(--text-primary);
-    font-weight: 600;
-    font-size: 1.15rem;
-    margin-bottom: 0.25rem;
-}
-
-.announcements-card .item-left,
-.birthdays-card .item-left {
-    display: flex;
-    gap: 0.06rem; /* make title and author/date stack closely */
-    align-items: flex-start;
-    flex: 1 1 auto;
-    flex-direction: column; /* stack title + badges vertically */
-}
-
-/* specifically tighten author spacing under title in announcements */
-.announcements-card .item-left .muted-text {
-    margin-top: 0.04rem;
-    font-size: 0.92rem; /* keep author slightly smaller */
-}
-
-/* Fixed-position meta block on the right of each card row */
-.announcements-card .item-meta,
-.birthdays-card .item-meta {
-    position: absolute;
-    right: 1.25rem; /* align inside card padding */
-    top: 1.25rem; /* align with title baseline inside card */
-    width: 140px;
-    text-align: right;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-.announcement-title {
-    font-weight: 600;
-    /* match the stat-card title color (less visually strong than primary) */
-    color: var(--text-secondary);
-    display: block;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-/* Events: tighten spacing between scheduled date and location, and align schedule with right-side badge */
-.birthdays-card .title-row {
-    margin-bottom: 0; /* keep title and subsequent metadata close */
-}
-.birthdays-card .item-left .muted-text {
-    margin-top: 0.06rem; /* match item-meta muted-text spacing */
-}
-.birthdays-card .item-left .muted-text + .muted-text {
-    margin-top: 0.02rem; /* very small gap between date and location */
-}
-/* Slight vertical nudge for the badge in case layout differs; use relative positioning for fine control */
-.birthdays-card .item-meta .badges-row {
-    position: relative;
-    top: 0.06rem; /* small nudge to better align with schedule baseline */
-}
-
-/* subtle hover for discoverability */
-.announcements-card li:hover {
-    background: color-mix(in srgb, var(--bg-secondary) 92%, var(--bg-tertiary) 8%);
-    border-radius: 8px;
-}
-
-.item-meta {
-    margin-left: 1rem;
-    color: var(--text-secondary);
-    white-space: nowrap;
-}
-
-.card-top-icon {
-    font-size: 1.6rem;
-    margin-right: 0.6rem;
-}
-
-.card-top {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.5rem;
-}
-
-/* Make inline card section headings use the primary text color (adapts to theme) */
-.card-top h3 {
-    color: var(--text-primary);
-    font-weight: 600;
-    margin: 0;
-}
-
-/* Reduce spacing specifically for birthdays card headings so the "Feliz aniversário"
-   label sits closer to the listed names without affecting other cards. */
-.birthdays-card li.section-heading .card-top {
-    margin-bottom: 0.15rem;
-}
-
-/* Unified flash/toast styling: flashes appear fixed at the bottom center of the viewport
-   and use a single consistent visual style for all server-side flash messages. */
-.flash-container,
-#flash-container {
-    position: fixed;
-    right: 1rem;
-    bottom: 1.25rem;
-    left: auto;
-    transform: none;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-    z-index: 11000;
-    pointer-events: none; /* let clicks pass through unless on the flash itself */
-    width: auto;
-    max-width: min(420px, calc(100% - 2rem));
-}
-
-
-.flash {
-    pointer-events: auto;
-    width: 100%;
-    box-sizing: border-box;
-    background: linear-gradient(180deg, var(--bg-secondary), color-mix(in srgb, var(--bg-secondary) 92%, var(--bg-tertiary)) );
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    padding: 0.6rem 0.9rem;
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(2,6,23,0.08);
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    max-width: 420px;
-}
-
-/* single subtle accent bar to the left to provide affordance without changing color per-category */
-#flash .flash-icon, .flash .flash-message { display: inline-block; vertical-align: middle; }
-.flash .flash-icon {
-    font-size: 1.05rem;
-    width: 1.4rem;
-    text-align: center;
-    margin-right: 0.35rem;
-    color: var(--accent);
-}
-.flash .flash-message { color: var(--text-primary); }
-
-/* keep subtle accent bar to the left for visual affordance (not category-specific) */
-.flash::before {
-    content: '';
-    width: 5px;
-    height: 100%;
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--accent) 60%, var(--bg-secondary));
-    display: inline-block;
-}
-
-/* Color variants for small icon to give immediate affordance while keeping base unified */
-.flash--success .flash-icon { color: var(--success); }
-.flash--error .flash-icon { color: var(--danger); }
-.flash--warning .flash-icon { color: #d97706; } /* amber-600 */
-.flash--info .flash-icon { color: var(--accent); }
-
-/* Make the subtle left bar neutral so it doesn't feel 'blue' for info messages */
-.flash { --flash-bar: color-mix(in srgb, var(--muted) 18%, var(--bg-secondary)); }
-.flash::before { background: var(--flash-bar); }
-
-/* Make flashes dismissable when user clicks them (JS removes after animation) */
-.flash[hidden] { display: none !important; }
-
-/* Keep the ephemeral JS toast system styles defined later (do not override here). */
-
-/* Heading list items inside the birthdays/events card should not show the dashed divider
-   so events and birthday sections feel visually connected */
-.birthdays-card li.section-heading {
-    border-bottom: none;
-    padding: 0;
-    margin-bottom: 0.5rem;
-}
-
-.last-punch {
-    display: inline-block;
-    margin-left: 1rem;
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    align-self: center;
-}
-
-/* Top cards grid to align announcements/birthdays with action-card column sizing */
-.top-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-/* On wider screens prefer exactly two equal columns for the top report cards so
-   Presenças and Horas Trabalhadas occupy the same width. The activity-report
-   continues to span the full width below. */
-@media (min-width: 900px) {
-    .top-cards {
-        grid-template-columns: 1fr 1fr !important;
-        grid-auto-rows: minmax(0, auto);
-    }
-
-    /* Ensure each direct child card fills its grid cell instead of sizing itself */
-    .top-cards > .form-container {
-        width: 100% !important;
-        justify-self: stretch;
-        align-self: start;
-    }
-}
-
-/* Increase visual height of the two top cards (Presenças e Horas Trabalhadas) on wide screens */
-.top-cards > .form-container:not(.activity-report) {
-    min-height: 180px; /* reduced so cards don't leave excessive empty space */
-}
-
-@media (min-width: 1100px) {
-    .top-cards > .form-container:not(.activity-report) {
-        min-height: 220px; /* balanced on very wide viewports */
-    }
-}
-
-/* Activities grid: display activity names as small cards similar to report cards */
-.activity-cards {
-    display: grid;
-    /* Prefer 3 columns on wide screens, fall back to responsive fit on small screens */
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-}
-@media (max-width: 1000px) {
-    .activity-cards { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
-}
-@media (max-width: 700px) {
-    .activity-cards { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-}
-.activity-card {
-    background: linear-gradient(180deg, color-mix(in srgb, var(--bg-secondary) 96%, var(--bg-tertiary)), var(--bg-secondary));
-    padding: 1rem 1.25rem;
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(2,6,23,0.06);
-    border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.activity-card { flex-direction: column; align-items: stretch; text-align: left; }
-.activity-card-title { font-weight:700; font-size:1rem; margin-bottom:0.25rem; }
-.activity-card-actions { margin-top:0.75rem; display:flex; gap:0.5rem; justify-content:flex-end; }
-.activity-card-actions .btn-small { padding: 0.35rem 0.6rem; font-size:0.85rem; }
-.activity-card .muted-text { margin-top:0.25rem; }
-
-/* Small user activity cards used on the dashboard for assigned activities */
-.user-activity-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 0.75rem;
-}
-.user-activity-card {
-    background: color-mix(in srgb, var(--bg-secondary) 96%, var(--bg-tertiary));
-    border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
-    padding: 0.6rem 0.75rem;
-    border-radius: 10px;
-    box-shadow: 0 6px 14px rgba(2,6,23,0.04);
-}
-.user-activity-row { display:flex; align-items:center; gap:0.5rem; }
-.user-activity-card input[type="checkbox"] { transform: scale(1.15); margin-right:0.5rem; }
-
-
-/* Quick activities grid shown on dashboard for assigned users */
-.quick-activities-row {
-    display: flex;
-    gap: 0.6rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin-top: 0.4rem;
-    padding-bottom: 0.25rem;
-}
-.quick-activity-cell { display: block; }
-.quick-activity-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 220px;
-    padding: 0.45rem 0.6rem;
-    gap: 0.6rem;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    text-decoration: none;
-    color: var(--text-primary);
-}
-.quick-activity-left { display:flex; gap:0.6rem; align-items:center; }
-.quick-activity-emoji { font-size:1.4rem; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; }
-.quick-activity-info { min-width:0; }
-.quick-activity-title { font-weight:600; }
-.quick-activity-desc { font-size:0.88rem; color:var(--text-secondary); margin-top:0.2rem; }
-.quick-activity-right { display:flex; flex-direction:column; align-items:flex-end; gap:0.35rem; }
-.quick-activity-count small { font-size:0.9rem; color:var(--text-secondary); }
-.quick-activity-action {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    padding: 0.25rem 0.55rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-}
-
-@media (max-width: 900px) {
-    .quick-activities-row { gap: 0.5rem; }
-    .quick-activity-card { min-width: 190px; padding: 0.45rem; }
-}
-@media (max-width: 520px) {
-    .quick-activity-card { min-width: 160px; padding: 0.35rem; }
-    .quick-activity-action { padding: 0.18rem 0.45rem; font-size:0.82rem; }
-}
-
-/* Disable horizontal scrolling for quick activities on mobile and stack cards vertically */
-@media (max-width: 700px) {
-    .quick-activities-row {
-        display: flex;
-        flex-direction: column;
-        gap: 0.6rem;
-        overflow: visible; /* ensure all buttons are visible without scrolling */
-        padding-bottom: 0;
-        margin-top: 0.6rem;
-    }
-    .quick-activity-card {
-        min-width: 0 !important;
-        width: 100%;
-        padding: 0.75rem 0.8rem;
-        align-items: flex-start;
-        gap: 0.6rem;
-    }
-    .quick-activity-left { align-items: flex-start; }
-    .quick-activity-right {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.4rem;
-        width: 100%;
-    }
-    .quick-activity-action {
-        width: 100%;
-        text-align: center;
-        padding: 0.5rem 0.6rem;
-        box-sizing: border-box;
-    }
-    .quick-activity-count { order: 3; width: 100%; }
-}
-
-/* Buttons and controls inside quick activities container */
-.form-container.wide.quick-activities-card .btn-small,
-.form-container.wide.quick-activities-card .btn-primary {
-    padding: 0.28rem 0.6rem;
-    min-width: 56px;
-    min-height: 32px;
-    font-size: 0.9rem;
-}
-
-/* Reduce the wide form padding specifically for the quick activities card so it doesn't appear too tall */
-.form-container.wide.quick-activities-card {
-    /* match the .form-container.wide sizing and padding so the right edge aligns with other top cards */
-    /* match the standard wide form sizing so the edges align with the top cards */
-    /* narrow the max width slightly so visual rhythm matches other top cards */
-    width: min(1100px, calc(100vw - 4rem));
-    max-width: none;
-    /* slightly tighter padding so the quick activities card doesn't feel too tall */
-    padding: 0.8rem 1rem;
-    margin-left: auto;
-    margin-right: auto;
-    box-sizing: border-box;
-    border-radius: 8px;
-    box-shadow: none; /* keep visual weight low */
-    border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
-}
-
-/* Prevent wide form-container from forcing each card to full-width inside the top-cards grid.
-   Allow grid to size children responsively so cards sit side-by-side when space allows. */
-.top-cards > .form-container.wide {
-    width: auto !important;
-    max-width: none !important;
-    padding: 1rem 1.25rem; /* tighter padding inside grid to reduce vertical gaps */
-}
-
-/* Ensure cards inside .top-cards stretch to same height and their content is vertically distributed */
-.top-cards { align-items: stretch; }
-.top-cards > .form-container { display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; }
-.top-cards > .form-container .search-input { margin-bottom: 0.5rem; }
-
-/* Ensure the activity report card sits below the other two cards and spans full width */
-.top-cards > .form-container.activity-report {
-    grid-column: 1 / -1;
-}
-
-/* Ensure action buttons inside the top-cards are pushed to the bottom of the card
-   so all cards have consistent footer alignment regardless of internal content height. */
-.top-cards > .form-container .card-actions {
-    margin-top: auto;
-}
-
-/* But keep the activity-report card actions normal (they float with content) */
-.top-cards > .form-container.activity-report .card-actions {
-    margin-top: 0;
-}
-
-/* Card rows inside report cards: consistent alignment across cards and responsive */
-.card-row {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-wrap: wrap;
-    width: 100%;
-}
-.card-row .control {
-    flex: 1 1 auto;
-    min-width: 180px;
-}
+/* ações de card com botões alinhados */
 .card-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: .5rem;
     align-items: center;
+    margin-top: auto;
 }
-
-@media (max-width: 700px) {
-    .card-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .card-actions {
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-    }
-    .card-actions .btn-primary,
-    .card-actions .btn-secondary {
-        width: 100%;
-    }
-}
-
-/* Make report cards appear 'filled' and centered content */
-.top-cards > .form-container.announcements-card,
-.top-cards > .form-container.birthdays-card {
-    /* stronger background and inner padding to look like a filled card */
-    background: linear-gradient(180deg, color-mix(in srgb, var(--bg-secondary) 94%, var(--bg-tertiary)), var(--bg-secondary));
-    padding: 2rem;
-    box-shadow: 0 12px 30px rgba(2,6,23,0.08);
-    border-radius: 14px;
-    border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+.card-row {
     display: flex;
-    flex-direction: column;
-    /* Do not center content — allow elements to stretch and fill the card */
-    justify-content: flex-start;
-    align-items: stretch;
-    text-align: left;
+    gap: .5rem;
+    align-items: center;
+    flex-wrap: wrap;
 }
+.card-row .control { flex: 1 1 auto; min-width: 160px; }
 
-/* Desktop: slightly reduce button sizes in top cards and quick-activity actions for tighter UI */
-@media (min-width: 900px) {
-    /* quick activity action buttons (dashboard) */
-    .quick-activity-action {
-        padding: 0.18rem 0.45rem;
-        font-size: 0.82rem;
-        min-height: 32px;
-        border-radius: 7px;
-        min-width: 60px;
-    }
+/* ============================================================
+   17. ANÚNCIOS & EVENTOS — expand/colapso
+   ============================================================ */
 
-    /* top-cards action buttons (reduce visual bulk) */
-    .top-cards > .form-container .card-actions .btn-primary,
-    .top-cards > .form-container .card-actions .btn-small {
-        padding: 0.35rem 0.7rem;
-        min-height: 34px;
-        font-size: 0.95rem;
-        min-width: 60px;
-    }
-
-    /* subtle reduction for small buttons inside lists */
-    .announcements-table .btn-small, .events-table .btn-small {
-        padding: 0.24rem 0.5rem;
-        min-height: 32px;
-        font-size: 0.88rem;
-        min-width: 60px;
-    }
-}
-
-.top-cards > .form-container.announcements-card .card-row,
-.top-cards > .form-container.announcements-card .card-actions,
-.top-cards > .form-container.birthdays-card .card-row,
-.top-cards > .form-container.birthdays-card .card-actions {
-    justify-content: flex-start;
-}
-
-/* Controls should fill available card width instead of being constrained to a centered column */
-.top-cards > .form-container .card-row .control {
-    max-width: none;
+/* tabelas de avisos e eventos */
+.announcements-table,
+.events-table {
     width: 100%;
+    border-collapse: collapse;
 }
 
-/* Make action buttons size modest by default but allow layout to control their width */
-.top-cards > .form-container .card-actions { gap: 0.75rem; margin-top: auto; justify-content: flex-end; }
-
-/* Ensure action buttons in top-cards align and have consistent sizing */
-.top-cards > .form-container .card-actions .btn-primary,
-.top-cards > .form-container .card-actions .btn-secondary {
-    min-width: 120px;
-}
-
-/* For the activity-report (full-width) we want buttons to sit directly under the form fields
-   and align with the other inputs instead of floating to the very bottom of the equal-height row. */
-.top-cards > .form-container.activity-report { align-items: stretch; }
-.top-cards > .form-container.activity-report .card-actions {
-    /* place actions immediately after the content flow */
-    margin-top: 0.5rem;
-    margin-bottom: 0;
-    align-self: stretch;
-    justify-content: flex-start; /* align buttons with start of container */
-}
-.top-cards > .form-container.activity-report .card-actions .export-dropdown { margin-right: 0.5rem; }
-.top-cards > .form-container .card-actions .btn-primary,
-.top-cards > .form-container .card-actions .btn-secondary {
-    min-width: 120px;
-}
-
-/* Ensure action buttons inside report cards are right-aligned (bottom-right of the card) */
-.top-cards > .form-container .card-actions {
-    justify-content: flex-end;
-}
-
-/* Announcements table: fix layout so expanding messages doesn't change column widths */
-.announcements-table, .events-table {
-    /* revert to auto layout so column widths follow content and previous sizing */
-    table-layout: auto;
-    width: 100%;
-}
-.announcements-table th:nth-child(2), .events-table th:nth-child(2),
-.announcements-table td:nth-child(2), .events-table td:nth-child(2) {
-    width: auto; /* allow natural sizing as before */
-}
+/* container da mensagem (inline) */
 .announcement-message {
-    /* Keep the message container tight by default; margins controlled elsewhere. */
-    margin: 0;
-    /* Use flex layout so the truncated block and the expand button can sit
-       on the same horizontal line; when expanded we switch to column. */
     display: flex;
-    gap: 0; /* no gap so link visually follows the ellipsis */
-    align-items: flex-end; /* align link to the last line of truncated text */
+    gap: 0;
+    align-items: flex-end;
 }
 
-/* Ensure announcements table and dashboard cards use the same inline layout as events on desktop
-   (some pages suffered different cascade). These rules apply only for desktop widths. */
-@media (min-width: 701px) {
-    .announcements-table .announcement-message,
-    .announcements-card .announcement-message,
-    .birthdays-card .announcement-message,
-    .compact-list .announcement-message,
-    .announcement-message {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: flex-end !important;
-        gap: 0 !important;
-    }
-
-    .announcements-table .expand-btn,
-    .announcements-card .expand-btn,
-    .birthdays-card .expand-btn,
-    .compact-list .expand-btn {
-        display: inline-flex !important;
-        margin: 0 0 0 -0.6rem !important; /* sit close to trailing ellipsis */
-        padding: 0.08rem 0.18rem !important;
-        font-size: 0.95rem !important;
-        text-decoration: none !important;
-    }
-
-    /* When a message is expanded on desktop, keep it visually in-place by
-       stacking its content vertically; this ensures the cell width doesn't
-       change while allowing the text to occupy full available width. */
-    .announcement-message.expanded {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 0.35rem !important;
-    }
-    .announcement-message.expanded .expand-btn {
-        display: inline-block !important;
-        margin: 0.35rem 0 0 0 !important;
-        text-decoration: none !important;
-    }
-}
-
-/* Ensure announcement message children can shrink and wrap so expanding the
-   message doesn't force its table cell to grow horizontally. Keep layout
-   automatic (table-layout:auto) to avoid breaking table visuals. */
-.announcement-message > .truncated-box,
-.announcement-message > .full-text {
-    min-width: 0;
-    max-width: 100%;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-/* Make sure table cells can wrap content without expanding table width */
-.announcements-table td { overflow-wrap: anywhere; word-break: break-word; }
-
-/* By default show the truncated preview inline so the expand button can sit
-   immediately after the trailing ellipsis without introducing vertical gaps. */
-/* Legacy truncated-text rules removed in favor of the explicit
-   .truncated-box / .full-text / .expand-btn pattern. */
-
-/* Styles for the explicit truncated-box / full-text pattern */
+/* caixa de prévia truncada (3 linhas) */
 .truncated-box {
-    /* Prefer line-clamp where supported (Chrome, Safari). Fallback to
-       max-height + overflow for other browsers. This produces a consistent
-       3-line preview while keeping the gutter small so the inline control
-       ('Ver mais') appears close to the text. */
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -2215,750 +1219,214 @@ a.btn-primary, a.btn-secondary, a.btn-logout {
     overflow: hidden;
     max-height: calc(1.4em * 3);
     line-height: 1.4;
-    position: relative;
-    /* Smaller right-hand gutter — events already use a tight gutter; match it */
-    padding-right: 1.4rem;
-    box-sizing: border-box;
-    transition: max-height 220ms ease, padding-right 140ms ease, opacity 140ms ease;
+    padding-right: 1rem;
 }
-.truncated-box .truncated-ellipsis { display: inline; }
-.full-text {
-    display: none; /* hidden until expanded */
-}
-/* When expanded, JS swaps content into the visible .truncated-box so we avoid
-   removing elements from the flow; keep .full-text available but hidden by default. */
-/* full-text visibility is managed by JS and by mobile-specific rules; avoid forcing
-    display:block on desktop to prevent duplicate content when we swap into the preview. */
-/* Improved inline "Ver mais" control: looks like continuation of the text */
+
+/* texto completo (oculto até expandir) */
+.full-text { display: none; }
+
+/* botão de expandir/colapsar — inline, estilo link */
 .expand-btn {
     display: inline-flex;
-    align-items: baseline; /* align with last line */
-    gap: 0.12rem;
+    align-items: baseline;
+    white-space: nowrap;
     background: transparent;
     border: none;
-    padding: 0.12rem 0.22rem; /* small hit area while remaining visually inline */
-    margin: 0 0 0 -0.7rem; /* pull left to sit close to the reserved gutter/ellipsis */
     color: var(--accent);
-    text-decoration: none; /* no underline by default */
+    padding: .1rem .2rem;
+    margin: 0 0 0 -.5rem;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: .9rem;
     line-height: 1.4;
-    vertical-align: baseline;
-    transition: color 140ms ease, transform 80ms ease;
-    border-radius: 4px;
-}
-
-/* Ensure expand control never shows an underline (desktop + mobile). */
-.expand-btn:hover {
     text-decoration: none;
-    transform: translateY(-1px);
+    flex-shrink: 0;
 }
+.expand-btn:hover { opacity: .8; text-decoration: none; }
 
-.expand-btn:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
-    text-decoration: none;
-}
-
-/* Explicitly ensure no underlines across variants/contexts */
-.announcements-table .expand-btn,
-.events-table .expand-btn,
-.announcements-card .expand-btn,
-.announcement-message .expand-btn {
-    text-decoration: none;
-}
-
-.announcements-table .expand-btn:hover,
-.events-table .expand-btn:hover,
-.announcements-card .expand-btn:hover,
-.announcement-message .expand-btn:hover {
-    text-decoration: none;
-}
-
-.announcement-message .full-text {
-    display: none; /* hidden until expanded */
-    flex: 1 1 auto;
-}
-
-/* Make announcemens behave like events: show full-text when expanded and hide preview */
-.announcement-message.expanded .truncated-box { display: none !important; }
-.announcement-message.expanded .full-text { display: block !important; max-height: none !important; opacity: 1 !important; }
-
-/* Desktop: lock column widths so the message column keeps exactly the same
-   width whether 'Ver mais' is open or closed. Also slightly increase the
-   author column (3rd) to bring it closer to the message column. */
-@media (min-width: 1000px) {
-    .announcements-table {
-        table-layout: fixed; /* stable column widths to avoid relayout on expand */
-        width: 100%;
-    }
-    /* Title | Message | Author | Date | (Actions) */
-    /* More balanced column widths: Title | Message | Author | Date | Actions */
-    .announcements-table th:nth-child(1), .announcements-table td:nth-child(1) { width: 15%; min-width: 140px; }
-    .announcements-table th:nth-child(2), .announcements-table td:nth-child(2) { width: 40%; }
-    .announcements-table th:nth-child(3), .announcements-table td:nth-child(3) { width: 10%; min-width: 120px; }
-    .announcements-table th:nth-child(4), .announcements-table td:nth-child(4) { width: 15%; min-width: 100px; }
-    .announcements-table th:nth-child(5), .announcements-table td:nth-child(5) { width: 20%; min-width: 60px; }
-
-    /* Reduce the right padding on the truncated preview so 'Ver mais' sits
-       visually closer to the end of the preview and the author column is
-       closer to the message column. */
-    .announcements-table td:nth-child(2) .truncated-box {
-        padding-right: 0.6rem;
-    }
-
-    /* Ensure message content wraps within its allocated width without
-       expanding the column. */
-    .announcements-table td:nth-child(2) { overflow: hidden; }
-    .announcements-table td { overflow-wrap: anywhere; word-break: break-word; }
-
-    /* Keep expand button inline for collapsed state but move below when expanded */
-    /* desktop inline spacing removed for announcements; placement handled by consolidated rules */
-    .announcements-table .announcement-message.expanded { flex-direction: column !important; }
-
-    /* Keep table-cell semantics for the message column on desktop so
-       different browsers compute table layout consistently. Control the
-       visual layout through the inner .announcement-message element
-       instead of changing the td's display property. */
-    .announcements-table td:nth-child(2) {
-        /* prevent horizontal overflow while preserving table layout */
-        overflow: hidden;
-        width: 48%;
-    }
-
-    /* Use the inner container to present inline (row) layout when
-       collapsed and column layout when expanded. This avoids changing
-       the td display mode which can lead to cross-browser inconsistencies. */
-    .announcements-table td:nth-child(2) .announcement-message {
-        width: 100% !important;
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: flex-end !important;
-    }
-}
-
-/* When a full-text element is rendered without aria-hidden (meaning it's
-   intended to be shown inline because the content is short), ensure it is
-   visible. This preserves the default hidden behavior for expandable blocks. */
-.announcement-message > .full-text:not([aria-hidden]) {
-    display: block !important;
-}
-
-/* Do not force full-text visible on expansion; JS will swap content into
-    the visible truncated preview to avoid layout shifts. Mobile rules may
-    still override display for small screens where necessary. */
-
-
-.announcement-actions {
-    margin-top: 0.25rem;
-}
-
-/* Base styles for expand control inside announcement/event message.
-   Keep these minimal — specific placements and visual variants are
-   handled by scoped selectors elsewhere (table vs card vs mobile). */
-.announcement-message .expand-btn {
-    color: var(--accent);
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    text-decoration: none;
-    vertical-align: baseline;
-}
-
-/* When the expand button is moved outside the message container (for mobile),
-   ensure it's visible and sits below the message preview. Give it full-width
-   on very small screens so it's easy to tap. */
-.announcements-table tbody tr .expand-btn,
-.announcements-card .expand-btn {
-    display: inline; /* enforce inline display in table/list contexts */
-    margin: 0 0 0 0.25rem;
-    font-size: 0.95rem;
-    color: var(--accent);
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    vertical-align: baseline;
-    text-decoration: underline;
-}
-
-.announcements-table th, .announcements-table td {
-    vertical-align: middle;
-}
-/* Mobile/tablet layout for the message cell is applied inside the
-   responsive blocks below. Avoid forcing the td to become a flex
-   container globally, which can change table semantics in some browsers. */
-.announcement-actions {
-    margin-top: 0.25rem;
-}
-
-/* Reduce extra gap below expanded messages to keep rows compact */
+/* estado expandido (gerenciado pelo JS) */
 .announcement-message.expanded {
-    /* avoid introducing extra bottom gap when expanded */
-    margin-bottom: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .35rem;
 }
+.announcement-message.expanded .truncated-box { display: none; }
+.announcement-message.expanded .full-text     { display: block; max-height: none; }
+.announcement-message.expanded .expand-btn    { margin: 0; }
 
-@media (max-width: 420px) {
-    .announcements-table tbody tr .expand-btn,
-    .announcements-card .expand-btn,
-    .events-table tbody tr .expand-btn {
-        /* On very small screens make the button full-width for easier tapping. */
-        display: inline-block;
-        width: 100%;
-        text-align: left;
-        padding-left: 0;
-        margin: 0.35rem 0 0 0; /* restore a small top gap on mobile only */
+/* largura fixa de colunas em desktop */
+@media (min-width: 701px) {
+    .announcements-table { table-layout: fixed; }
+    .announcements-table th:nth-child(1), .announcements-table td:nth-child(1) { width: 16%; }
+    .announcements-table th:nth-child(2), .announcements-table td:nth-child(2) { width: 42%; }
+    .announcements-table th:nth-child(3), .announcements-table td:nth-child(3) { width: 12%; }
+    .announcements-table th:nth-child(4), .announcements-table td:nth-child(4) { width: 14%; }
+    .announcements-table th:nth-child(5), .announcements-table td:nth-child(5) { width: 16%; }
+
+    .events-table { table-layout: fixed; }
+    .events-table th:nth-child(1), .events-table td:nth-child(1) { width: 14%; }
+    .events-table th:nth-child(2), .events-table td:nth-child(2) { width: 34%; }
+    .events-table th:nth-child(3), .events-table td:nth-child(3) { width: 17%; }
+    .events-table th:nth-child(4), .events-table td:nth-child(4) { width: 17%; }
+    .events-table th:nth-child(5), .events-table td:nth-child(5),
+    .events-table th:nth-child(6), .events-table td:nth-child(6) { width: 18%; }
+
+    .announcements-table td, .events-table td {
+        overflow: hidden;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+    .announcements-table td, .events-table td {
+        vertical-align: middle;
     }
 }
 
-/* Modal styles for announcements full-read modal */
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    display: none; /* toggled by JS */
+/* eventos: textos truncados */
+.events-table .truncated-text {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.events-table .event-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    max-height: 5.4rem;
+    word-break: break-word;
+}
+
+/* ============================================================
+   18. ATIVIDADES RÁPIDAS (dashboard voluntário)
+   ============================================================ */
+
+.quick-activities-card {
+    padding: .9rem 1rem;
+    margin-top: 1rem;
+}
+.quick-activities-row {
+    display: flex;
+    gap: .6rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: .25rem;
+    margin-top: .5rem;
+}
+.quick-activity-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 210px;
+    padding: .5rem .75rem;
+    gap: .6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+.quick-activity-card:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+}
+.quick-activity-left { display: flex; gap: .6rem; align-items: center; }
+.quick-activity-emoji {
+    font-size: 1.4rem;
+    width: 34px; height: 34px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+}
+.quick-activity-title { font-weight: 600; font-size: .92rem; }
+.quick-activity-count small { font-size: .82rem; color: var(--text-secondary); }
+
+/* atividades de relatório */
+.activity-group { margin-bottom: 1.5rem; }
+.activity-group .group-title { font-size: 1.05rem; margin-bottom: .65rem; }
+.activity-cards-grid { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+/* ============================================================
+   19. PÁGINA DE LOGIN
+   ============================================================ */
+
+.login-container {
+    display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.5);
-    z-index: 1400;
+    min-height: 100vh;
+    padding: 1rem;
 }
-.modal {
+.login-box {
     background: var(--bg-secondary);
-    color: var(--text-primary);
-    width: min(720px, 92%);
-    max-height: 80vh;
-    overflow: auto;
-    border-radius: 10px;
-    box-shadow: 0 20px 60px rgba(2,6,23,0.6);
-    padding: 0.5rem 0.75rem 1rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-md);
 }
-.modal-header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:0.5rem;
-    padding: 0.75rem 0.5rem;
-    border-bottom: 1px solid var(--border);
+.login-box h1 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: .4rem;
+    font-weight: 800;
 }
-.modal-header h2 { font-size: 1.1rem; margin:0; }
-.modal-close {
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
+.subtitle {
     color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 1.75rem;
+    font-size: .9rem;
+    line-height: 1.5;
 }
-.modal-body { padding: 0.75rem 0.5rem; line-height: 1.5; }
-
-@media (max-width: 700px) {
-    .top-cards > .form-container.announcements-card,
-    .top-cards > .form-container.birthdays-card {
-        padding: 1rem;
-        align-items: stretch;
-        text-align: left;
-    }
-    .top-cards > .form-container .card-row .control { max-width: none; }
-    .top-cards > .form-container .card-actions { align-items: center; }
+.login-theme-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: .75rem;
 }
-
-/* Make their min-height visually similar to action-card */
-.announcements-card, .birthdays-card {
-    min-height: 140px;
+/* inputs ocupam a largura total no login */
+.login-box .form-group { display: flex; flex-direction: column; }
+.login-box .control { width: 100%; }
+.login-submit {
+    display: block;
+    width: 100%;
+    margin-top: .25rem;
 }
-
-/* Mobile adjustments: reduce paddings and stack with quick button on top */
-@media (max-width: 700px) {
-    body { font-size: 15px; }
-    .main-content { padding: 1rem; }
-    .form-container { padding: 1rem; max-width: 100%; }
-    .action-card { padding: 1rem; }
-    .top-cards { grid-template-columns: 1fr; }
-    .announcements-card, .birthdays-card { min-height: auto; }
-    .content-actions { margin-bottom: 0.75rem; display:flex; gap:0.75rem; align-items:center; }
-    .last-punch { margin-left: 0; }
+.input-flag {
+    font-size: .88rem;
+    color: var(--text-secondary);
+    margin-bottom: .35rem;
+    display: block;
 }
-
-/* Responsive transform for announcements table: convert rows into card-like blocks on small screens */
-@media (max-width: 700px) {
-    .announcements-table {
-        border: none;
-        width: 100%;
-    }
-    .announcements-table thead, .events-table thead { display: none; }
-    .announcements-table tbody tr {
-        display: block;
-        position: relative; /* allow absolute top-actions inside */
-        background: var(--bg-secondary);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1rem; /* keep consistent inner spacing on all sides */
-        margin-bottom: 0.9rem;
-        box-shadow: 0 8px 24px rgba(2,6,23,0.06);
-    }
-    .announcements-table tbody td, .events-table tbody td {
-        display: block;
-        width: 100%;
-        /* provide comfortable horizontal padding so text doesn't touch card edges */
-        padding: 0.35rem 0.75rem;
-        text-align: left;
-    }
-
-    /* Ensure the message container inside the mobile card uses block layout
-       so truncated preview and full-text render vertically and the expand
-       control sits below the text for easy tapping. */
-    .announcements-table tbody td .announcement-message,
-    .announcements-table tbody td:nth-child(2) .announcement-message {
-        display: block !important;
-        width: 100% !important;
-        align-items: stretch !important;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Tweak event card aesthetics specifically to match announcements and improve spacing */
-    .events-table tbody tr {
-        background: linear-gradient(180deg, color-mix(in srgb, var(--bg-secondary) 96%, var(--bg-tertiary)), var(--bg-secondary));
-        border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(2,6,23,0.06);
-        padding: 1rem; /* consistent padding on all sides */
-        margin-bottom: 0.9rem; /* match announcements spacing between cards */
-    }
-
-    .events-table tbody td strong {
-        font-size: 1.06rem;
-        font-weight: 700;
-        margin-bottom: 0.45rem;
-        display: block;
-    }
-
-    .events-table tbody td .muted-text {
-        font-size: 0.95rem;
-        color: var(--text-secondary);
-        line-height: 1.45;
-    }
-
-    /* Date / time / location: make them look like meta rows */
-    .events-table tbody td:nth-child(3),
-    .events-table tbody td:nth-child(4),
-    .events-table tbody td:nth-child(5) {
-        color: var(--text-secondary);
-        font-size: 0.92rem;
-        margin-top: 0.25rem;
-    }
-
-    .events-table tbody tr .action-buttons {
-        margin-top: 0.6rem;
-        justify-content: flex-end;
-        gap: 0.5rem;
-    }
-
-    .events-table tbody td .action-buttons .btn-small {
-        flex: 0 0 auto;
-        min-width: 88px;
-        padding: 0.45rem 0.9rem;
-        font-size: 0.95rem;
-    }
-
-    .events-table .expand-btn {
-        display: inline-block;
-        margin-top: 0.35rem;
-        font-size: 0.95rem;
-        color: var(--accent);
-        text-decoration: underline;
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-    }
-    /* keep bottom action-buttons visible on mobile and place them side-by-side */
-    .announcements-table tbody td .action-buttons, .events-table tbody td .action-buttons { display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; }
-    .announcements-table tbody td .action-buttons .btn-small, .events-table tbody td .action-buttons .btn-small { flex: 0 0 auto; }
-
-    /* top-actions-mobile reserved but hidden to avoid duplication */
-    .top-actions-mobile { display: none !important; }
-    .announcements-table tbody td strong, .events-table tbody td strong { display: block; font-size: 1rem; margin-bottom: 0.35rem; }
-    .announcements-table tbody td strong, .events-table tbody td strong { white-space: normal; word-break: break-word; }
-    .announcements-table tbody td .muted-text, .events-table tbody td .muted-text { margin-bottom: 0.5rem; color: var(--text-secondary); }
-    .announcements-table tbody td .announcement-message, .events-table tbody td .announcement-message { margin-bottom: 0.5rem; }
-    .announcements-table tbody td .action-buttons, .events-table tbody td .action-buttons { display: flex; gap: 0.5rem; justify-content: flex-end; width: 100%; }
-    /* Make action buttons full-width stacked to match other cards */
-    .announcements-table tbody td .action-buttons .btn-small, .events-table tbody td .action-buttons .btn-small { flex: 1 1 auto; }
-    /* Reduce empty-state padding for small screens */
-    .empty-state { padding: 0.75rem; }
+.error-message {
+    background: color-mix(in srgb, var(--danger) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+    color: var(--danger);
+    padding: .65rem .9rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    font-size: .9rem;
+}
+.demo-info {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: .85rem;
 }
 
-/* Specific mobile fixes for announcements to avoid table min-width clipping and
-   to ensure titles and action buttons are visible on very small screens */
-@media (max-width: 700px) {
-    /* Remove inherited min-width that causes horizontal overflow */
-    .announcements-table, .events-table { min-width: 0 !important; width: 100% !important; }
-    /* Allow row and cells to expand vertically and not clip content */
-    .announcements-table tbody tr, .events-table tbody tr { overflow: visible; }
-    .announcements-table tbody td, .events-table tbody td { overflow: visible; }
-
-    /* Ensure full title (strong.full-text) is shown on mobile and truncated title hidden */
-    .announcements-table tbody td strong.full-text, .events-table tbody td strong.full-text { display: block !important; white-space: normal !important; word-break: break-word !important; }
-    .announcements-table tbody td strong.truncated-text, .events-table tbody td strong.truncated-text { display: none !important; }
-
-    /* Keep message truncation controlled by JS; ensure expand button is visible and action buttons are not clipped */
-    .announcements-table tbody td .action-buttons, .events-table tbody td .action-buttons { justify-content: flex-start; gap: 0.5rem; }
-    .announcements-table tbody td .action-buttons .btn-small, .events-table tbody td .action-buttons .btn-small { flex: 0 0 auto; }
+/* header centrado do formulário de intenção */
+.intention-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: .5rem;
 }
 
-/* Final mobile parity overrides: ensure events cards match announcements exactly */
-@media (max-width: 700px) {
-    .announcements-table tbody tr,
-    .events-table tbody tr {
-        /* identical card container visuals */
-        background: linear-gradient(180deg, color-mix(in srgb, var(--bg-secondary) 96%, var(--bg-tertiary)), var(--bg-secondary));
-        border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(2,6,23,0.06);
-        padding: 1rem;
-        margin-bottom: 0.9rem !important;
-    }
-
-    .announcements-table tbody td,
-    .events-table tbody td {
-        /* identical inner cell padding and text layout */
-        display: block;
-        width: 100%;
-        padding: 0.35rem 0.75rem;
-        text-align: left;
-    }
-
-    .announcements-table tbody td strong,
-    .events-table tbody td strong {
-        display: block;
-        font-size: 1rem;
-        margin-bottom: 0.35rem;
-        white-space: normal;
-        word-break: break-word;
-    }
-
-    /* Section separator between header/filter and the list */
-    .section-separator {
-        height: 12px;
-        display: block;
-        width: 100%;
-        margin: 0.35rem 0 0.6rem 0;
-    }
-
-    /* Event card inner divs separators */
-    .events-table tbody td .event-description { margin-bottom: 0.45rem; }
-    .events-table tbody td.event-meta .meta-content { color: var(--text-secondary); font-size: 0.92rem; margin-top: 0.25rem; }
-    .events-table tbody td .event-description + .meta-content, .events-table tbody td .event-description + div { margin-top: 0.4rem; }
-    /* small divider between description and meta/actions inside a card for clarity */
-    .events-table tbody td .event-description { border-bottom: 1px solid transparent; }
-    .events-table tbody tr { overflow: visible; }
-
-    .announcements-table tbody td .muted-text,
-    .events-table tbody td .muted-text {
-        margin-bottom: 0.5rem;
-        color: var(--text-secondary);
-    }
-}
-/* Mobile UX improvements specifically for events: stack actions and improve spacing */
-@media (max-width: 700px) {
-    /* Make expand control visible and full-width for easier tapping */
-    .events-table tbody td .expand-btn {
-        display: block;
-        width: 100%;
-        text-align: left;
-        padding: 0.35rem 0;
-        box-sizing: border-box;
-        text-decoration: underline;
-        color: var(--accent);
-        font-weight: 600;
-        font-size: 0.98rem;
-    }
-
-    /* Stack action buttons vertically as full-width touch targets */
-    /* On mobile, show action buttons side-by-side (like announcements) */
-    .events-table tbody td .action-buttons {
-        display: flex;
-        flex-direction: row; /* side-by-side */
-        gap: 0.5rem;
-        margin-top: 0.6rem;
-        width: 100%;
-        align-items: center;
-        justify-content: flex-end;
-    }
-    .events-table tbody td .action-buttons .btn-small {
-        flex: 0 0 auto; /* don't stretch to full width */
-        padding: 0.45rem 0.9rem;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        min-width: 88px;
-        box-sizing: border-box;
-    }
-    .events-table tbody td .action-buttons .btn-danger { padding: 0.6rem 0.8rem; }
-
-    /* Refine title and description spacing for mobile readability */
-    .events-table tbody td strong { font-size: 1.04rem; margin-bottom: 0.35rem; display:block; }
-    .events-table tbody td .muted-text { line-height: 1.45; margin-bottom: 0.45rem; color: var(--text-secondary); font-size: 0.95rem; }
-
-    /* Slightly increase card padding for comfortable touch targets */
-    .events-table tbody tr { padding: 1rem; }
-}
-
-/* Event-specific parity with announcements on mobile only.
-   These rules are intentionally scoped under .events-table so they
-   don't affect announcements or dashboard styles. They mirror the
-   announcements mobile behavior for expand button, truncated/full
-   span handling, spacing and action button layout. */
-@media (max-width: 700px) {
-    .events-table tbody tr .expand-btn {
-        /* match announcements expand button styling */
-        display: inline-block;
-        margin-top: 0.35rem;
-        font-size: 0.92rem;
-        color: var(--accent);
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        text-decoration: none; /* announcements do not underline */
-        width: 100%; /* keep full-width touch target on small screens */
-        text-align: left;
-    }
-
-    /* Mirror announcement message truncated/full behavior so JS toggles
-       don't produce different layout effects between events and announcements */
-    .events-table .announcement-message .full-text {
-        display: block;
-        opacity: 0;
-        max-height: 0;
-        overflow: hidden;
-        transform: none;
-        transition: none !important;
-    }
-    .events-table .announcement-message.expanded .full-text {
-        opacity: 1;
-        max-height: none;
-    }
-    .events-table .announcement-message .truncated-text {
-        display: block;
-        opacity: 1;
-    /* match announcements preview height to keep parity (3 lines) */
-    max-height: calc(1.4em * 3);
-        overflow: hidden;
-        transition: none !important;
-    }
-    .events-table .announcement-message.expanded .truncated-text {
-        opacity: 0;
-        max-height: 0;
-        display: none;
-    }
-
-    /* Ensure action buttons match announcements: comfortable full-width
-       touch targets and consistent sizing (but scoped to events) */
-    .events-table tbody td .action-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 0.6rem;
-        width: 100%;
-        align-items: stretch;
-        justify-content: flex-start;
-    }
-    .events-table tbody td .action-buttons .btn-small {
-        flex: 1 1 auto;
-        width: 100%;
-        padding: 0.45rem 0.9rem;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        min-width: 0;
-        box-sizing: border-box;
-    }
-
-    /* Full parity block: mirror announcements mobile rules exactly for events */
-    .events-table { border: none; width: 100%; }
-    .events-table thead { display: none; }
-    .events-table tbody tr {
-        display: block;
-        position: relative;
-        background: var(--bg-secondary);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 0.9rem !important;
-        box-shadow: 0 8px 24px rgba(2,6,23,0.06);
-    }
-    .events-table tbody td {
-        display: block;
-        width: 100%;
-        padding: 0.35rem 0.75rem;
-        text-align: left;
-    }
-    .events-table tbody td strong {
-        display: block;
-        font-size: 1rem;
-        margin-bottom: 0.35rem;
-        white-space: normal;
-        word-break: break-word;
-    }
-    .events-table .announcement-message .full-text { display: block; opacity: 0; max-height: 0; overflow: hidden; transition: none !important; }
-    .events-table .announcement-message.expanded .full-text { opacity: 1; max-height: none; }
-    .events-table .announcement-message .truncated-text { display: block; opacity: 1; max-height: calc(1.4em * 3); overflow: hidden; transition: none !important; }
-    .events-table .announcement-message.expanded .truncated-text { opacity: 0; max-height: 0; display: none; }
-
-     /* Mirror events table rules for announcements so their expand/collapse
-         animation and visibility rules match exactly (desktop & mobile parity). */
-     .announcements-table .announcement-message .full-text { display: block; opacity: 0; max-height: 0; overflow: hidden; transition: none !important; }
-     .announcements-table .announcement-message.expanded .full-text { opacity: 1; max-height: none; }
-     .announcements-table .announcement-message .truncated-text,
-     .announcements-table .announcement-message .truncated-box { display: block; opacity: 1; max-height: calc(1.4em * 3); overflow: hidden; transition: none !important; }
-     .announcements-table .announcement-message.expanded .truncated-text,
-     .announcements-table .announcement-message.expanded .truncated-box { opacity: 0; max-height: 0; display: none; }
-    .events-table tbody td .action-buttons { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 0.5rem !important; justify-content: center !important; width: 100% !important; }
-    .events-table tbody td .action-buttons .btn-small,
-    .events-table tbody td .action-buttons .btn-danger {
-        display: inline-flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        white-space: nowrap !important;
-        flex: 0 0 48% !important;
-        width: 48% !important;
-        min-width: 120px !important; /* prevent extreme narrow stacking */
-        box-sizing: border-box !important;
-        padding: 0.45rem 0.9rem !important;
-    }
-    .events-table tbody td .muted-text { margin-bottom: 0.5rem; color: var(--text-secondary); }
-    .events-table tbody td .announcement-message { margin-bottom: 0.5rem; }
-    .events-table .expand-btn { display: inline-block; margin-top: 0.35rem; font-size: 0.95rem; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; text-decoration: none; }
-}
-
-/* Centered error page */
-/* Mobile: improve the "Ver mais" UX for dashboard/announcements cards only */
-@media (max-width: 700px) {
-    /* Make the expand control a full-width, comfortable touch target on mobile
-       while keeping it visually consistent with the site's accent color. Scope
-       selectors to announcements-card so desktop/table rules are unaffected. */
-    .announcements-card .announcement-message .expand-btn,
-    .announcements-card .expand-btn,
-    .announcement-message .expand-btn {
-        display: block;
-        width: 100%;
-        text-align: left;
-        padding: 0.5rem 0;
-        margin: 0.4rem 0 0 0;
-        box-sizing: border-box;
-        background: transparent;
-        border-radius: 8px;
-        text-decoration: none; /* no underline on mobile */
-        font-weight: 600;
-        font-size: 1rem;
-        color: var(--accent);
-    }
-
-    /* Remove underline on hover for mobile full-width control */
-    .announcements-card .expand-btn:hover {
-        text-decoration: none;
-    }
-
-    .announcements-card .expand-btn:focus-visible,
-    .announcement-message .expand-btn:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
-    }
-
-    /* Reduce the right padding on the truncated box on mobile so text uses
-       available width while the expand control sits below as a full-width row. */
-    .announcements-card .truncated-box,
-    .events-table .truncated-box,
-    .announcement-message .truncated-box {
-        padding-right: 0.5rem;
-    }
-
-    /* Ensure the message container stacks vertically on mobile so the
-       "Ver mais" control sits below the preview as a tappable row. This
-       overrides the desktop inline-flex layout used for precise desktop
-       placement. */
-    .announcements-table tbody td .announcement-message,
-    .events-table tbody td .announcement-message,
-    .announcements-card .announcement-message,
-    .announcement-message {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 0.35rem !important;
-    }
-
-    /* When expanded on mobile, keep vertical stacking (full-text above button) */
-    .announcement-message.expanded {
-        flex-direction: column !important;
-    }
-
-    /* Dashboard-only: move the creation date (item-meta) below the title on mobile
-       so it no longer overlaps the title text. Scoped to announcement and birthdays
-       cards to avoid changing other lists. */
-    .announcements-card .card-row,
-    .birthdays-card .card-row {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 0.25rem !important;
-    }
-
-    .announcements-card .item-meta,
-    .birthdays-card .item-meta {
-        align-self: stretch !important;
-        margin-top: 0 !important;
-        display: flex !important;
-        gap: 0.35rem !important;
-        justify-content: flex-start !important;
-        flex-wrap: wrap !important;
-        /* Reset absolute positioning used on desktop so meta flows under title on mobile */
-        position: static !important;
-        right: auto !important;
-        top: auto !important;
-        width: auto !important;
-        text-align: left !important;
-    }
-
-    /* Make sure title uses full width so it doesn't wrap under meta unnecessarily */
-    .announcements-card .item-left,
-    .birthdays-card .item-left { width: 100%; }
-
-     /* Show the duplicated createdAt near the author/title (announcements only) and hide
-         the original timestamp in the right-side meta for announcements on mobile. Events
-         will keep their createdAt in item-meta but left-aligned via other rules. */
-     .mobile-created { display: inline-block !important; margin-left: 0.5rem !important; }
-     .announcements-card .item-meta > .muted-text:first-child { display: none !important; }
-
-    /* Slight spacing adjustments to keep mobile rows compact */
-    .announcements-card .title-row, .birthdays-card .title-row { margin-bottom: 0.15rem; }
-    .announcements-card .muted-text.mobile-created small,
-    .birthdays-card .muted-text.mobile-created small { color: var(--text-secondary); font-weight: 500; }
-
-    /* Left-align badges and ensure they sit with other content on mobile */
-    .announcements-card .badges-row,
-    .birthdays-card .badges-row {
-        display: flex !important;
-        gap: 0.4rem !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        margin-left: 0 !important;
-    }
-
-    /* Ensure badges align with other left-aligned meta on mobile and don't float right */
-    .announcements-card .badges-row, .birthdays-card .badges-row { align-self: flex-start !important; }
-
-    /* Keep author and mobile-created date on the same row for clearer reading */
-    .announcements-card .item-left .muted-text,
-    .birthdays-card .item-left .muted-text {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 0.45rem !important;
-        margin: 0 !important;
-    }
-
-    .announcements-card .item-left { width: 100%; display: flex; flex-direction: column; gap: 0.15rem; }
-    .birthdays-card .item-left { width: 100%; display: flex; flex-direction: column; gap: 0.15rem; }
-
-}
+/* ============================================================
+   20. PÁGINA 403
+   ============================================================ */
 
 .error-page {
     min-height: calc(100vh - 80px);
@@ -2968,1044 +1436,328 @@ a.btn-primary, a.btn-secondary, a.btn-logout {
     flex-direction: column;
     text-align: center;
     padding: 2rem;
+    gap: .5rem;
 }
-.error-page h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-.error-page p {
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-}
+.error-page h1 { font-size: 2rem; }
+.error-page p   { color: var(--text-secondary); }
 
-.form-actions {
+/* ============================================================
+   21. RELATÓRIOS
+   ============================================================ */
+
+.top-cards > .form-container {
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
+    flex-direction: column;
 }
-
-/* Buttons */
-.btn-primary,
-.btn-secondary,
-.btn-small,
-.btn-logout {
-    padding: 0 1rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    min-height: var(--control-height);
+.top-cards > .form-container .card-actions { margin-top: auto; }
+.top-cards > .form-container.activity-report {
+    grid-column: 1 / -1;
 }
+.top-cards > .form-container.activity-report .card-actions { margin-top: .5rem; }
 
-/* Ensure buttons use a normal font weight (avoid bold labels on action buttons) */
-.btn,
-.btn-primary,
-.btn-secondary,
-.btn-small,
-.btn-edit,
-.btn-logout,
-a.btn-primary,
-a.btn-secondary,
-a.btn-logout {
-    font-weight: 400;
-}
+/* ============================================================
+   22. ÚLTIMO PONTO (dashboard)
+   ============================================================ */
 
-/* Normalize button shapes across all button-like classes so they share the same
-   dimensions and alignment. Specific variants (.btn-primary, .btn-danger)
-   will still override colors/borders as needed. */
-.btn,
-.btn-primary,
-.btn-secondary,
-.btn-small,
-.btn-edit,
-.btn-danger,
-.btn-info,
-.btn-logout,
-a.btn,
-a.btn-primary,
-a.btn-secondary,
-a.btn-logout {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 1rem;
-    min-height: var(--control-height);
-    border-radius: 8px;
-    font-size: 1rem;
-    text-decoration: none;
-    box-sizing: border-box;
-}
-
-/* Default border for buttons unless a variant intentionally removes it */
-.btn,
-.btn-secondary,
-.btn-small,
-.btn-edit,
-.btn-logout {
-    border: 1px solid var(--border);
-}
-
-/* Keep primary/danger as strong, explicit variants */
-.btn-primary { border: none; }
-.btn-danger { border: none; }
-
-.btn-primary {
-    background: var(--accent);
-    color: white;
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 14%, transparent);
-}
-
-.btn-primary:hover {
-    background: var(--accent-hover);
-}
-
-.btn-secondary {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-}
-
-.btn-secondary:hover {
-    background: var(--bg-secondary);
-}
-
-.btn-small {
-    padding: 0 1rem;
-    font-size: 0.95rem;
-    min-height: var(--control-height);
-}
-
-/* Subtle edit buttons: keep Edit actions low-contrast in light mode, but visible in dark theme
-   Exclude danger/primary/logout variants so those remain explicit. */
-.btn-small:not(.btn-danger):not(.btn-primary):not(.btn-logout) {
-    background: transparent;
+.last-punch {
     color: var(--text-secondary);
-    border: 1px solid transparent;
-    box-shadow: none;
+    font-size: .92rem;
 }
-.btn-small:not(.btn-danger):not(.btn-primary):not(.btn-logout):hover {
-    background: color-mix(in srgb, var(--bg-secondary) 6%, var(--bg-tertiary));
-    color: var(--text-primary);
-    border-color: color-mix(in srgb, var(--border) 60%, transparent);
-}
-
-/* Ensure subtle edit buttons remain visible in dark modes (OS preference or explicit data-theme) */
-@media (prefers-color-scheme: dark) {
-    .btn-small:not(.btn-danger):not(.btn-primary):not(.btn-logout) {
-        background: rgba(255,255,255,0.03);
-        color: var(--text-primary);
-        border: 1px solid rgba(255,255,255,0.04);
-    }
-}
-html[data-theme="dark"] .btn-small:not(.btn-danger):not(.btn-primary):not(.btn-logout) {
-    background: rgba(255,255,255,0.03);
-    color: var(--text-primary);
-    border: 1px solid rgba(255,255,255,0.04);
-}
-
-/* Explicit edit button class so only Edit actions get the subtle treatment */
-.btn-edit {
-    /* Base: subtle in light mode -- match normalized button dimensions */
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-    padding: 0 1rem;
-    min-height: var(--control-height);
-    font-size: 0.95rem;
-    border-radius: 8px;
-}
-.btn-edit:hover {
-    background: color-mix(in srgb, var(--bg-secondary) 6%, var(--bg-tertiary));
-    color: var(--text-primary);
-    border-color: color-mix(in srgb, var(--border) 60%, transparent);
-}
-
-/* Dark-mode explicit override: ensure visibility */
-@media (prefers-color-scheme: dark) {
-    .btn-edit {
-        background: rgba(255,255,255,0.03);
-        color: var(--text-primary);
-        border: 1px solid rgba(255,255,255,0.04);
-    }
-}
-html[data-theme="dark"] .btn-edit {
-    background: rgba(255,255,255,0.03);
-    color: var(--text-primary);
-    border: 1px solid rgba(255,255,255,0.04);
-}
-
-/* Announcement/event button and message layout rules consolidated later in the file. */
-
-.btn-danger {
-    background: var(--danger);
-    color: white;
-}
-
-.btn-info {
-    background: var(--accent);
-    color: white;
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 14%, transparent);
-}
-.flash-container {
-    position: fixed; bottom: 16px; right: 16px; z-index: 2000;
-}
-.flash {
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    /* use theme surface so flash matches current theme; icons indicate message type */
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--bg-secondary) 10%, rgba(0,0,0,0.06));
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.flash-success { background: inherit; color: inherit; }
-.flash-error { background: inherit; color: inherit; }
-
-/* Inline field feedback for validation messages */
-.field-feedback { margin-top: 0.35rem; font-size: 0.95rem; color: var(--muted); }
-.field-feedback.error { color: var(--danger); }
-
-/* Utility class to mark invalid inputs from JS (also style :invalid) */
-.is-invalid { border-color: var(--danger) !important; box-shadow: 0 6px 18px color-mix(in srgb, var(--danger) 8%, transparent) !important; }
-/* Only show browser :invalid styling when the form or container explicitly requests it via .show-invalid */
-.show-invalid input:invalid, .show-invalid textarea:invalid, .show-invalid select:invalid {
-    border-color: var(--danger);
-}
-
-.btn-logout:hover {
-    background: var(--bg-primary);
-}
-
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: linear-gradient(180deg, var(--bg-secondary), color-mix(in srgb, var(--bg-secondary) 96%, var(--bg-tertiary)) );
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    gap: 1rem;
-}
-
-.stat-icon {
-    font-size: 2rem;
-}
-
-.stat-content h3 {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-/* Quick activities grid: up to 3 columns, large cards */
-.quick-activities-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-top: 0.75rem;
-}
-.quick-activity-cell { width: 100%; }
-.quick-activity-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 1.5rem;
-    min-height: 160px; /* larger card */
-    font-size: 1.05rem;
-    text-decoration: none;
-}
-.quick-activity-btn .muted-text { font-size: 0.9rem; }
-.quick-activity-emoji {
-    font-size: 2rem;
-    width: 56px;
-    height: 56px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--bg-secondary) 88%, transparent);
-}
-
-@media (max-width: 1100px) {
-    .quick-activities-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 700px) {
-    .quick-activities-grid { grid-template-columns: 1fr; }
-}
-
-/* Actions Grid */
-.actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.action-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: all 0.2s;
-}
-
-.action-card:hover {
-    border-color: color-mix(in srgb, var(--accent) 70%, var(--border));
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(2,6,23,0.18);
-}
-
-.action-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.action-card h3 {
-    margin-bottom: 0.5rem;
-}
-
-.action-card p {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-/* Table */
-.table-container {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 1rem; /* small gap so table doesn't stick to elements above */
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table th,
-.data-table td {
-    padding: 1rem;
-    text-align: left;
-}
-
-/* Events-specific tweaks */
-.events-table td .event-card-title {
-    max-width: 420px;
-}
-.events-table .truncated-text {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-}
-.events-table .event-description {
-    max-width: 520px;
-}
-/* Desktop: keep events table column widths stable so long descriptions don't resize columns */
-@media (min-width: 701px) {
-    .events-table {
-        table-layout: fixed; /* prevent automatic column resizing */
-        width: 100%;
-    }
-    /* Column width suggestions: title, description, details, location, created */
-    /* slightly reduce title and description widths to reserve room for actions column */
-    .events-table th:nth-child(1), .events-table td:nth-child(1) { width: 13%; }
-    /* reduce description and local columns slightly for better balance */
-    .events-table th:nth-child(2), .events-table td:nth-child(2) { width: 34%; }
-    .events-table th:nth-child(3), .events-table td:nth-child(3) { width: 17%; }
-    .events-table th:nth-child(4), .events-table td:nth-child(4) { width: 16%; }
-    /* Actions column may be the 5th or 6th column depending on template; reserve fixed px for both */
-    .events-table th:nth-child(5), .events-table td:nth-child(5),
-    .events-table th:nth-child(6), .events-table td:nth-child(6) { width: 150px; }
-
-    /* Ensure action buttons have a minimum width so they don't collapse */
-    .events-table td .action-buttons { min-width: 140px; }
-
-    /* Constrain the description cell and ensure long unbroken words don't expand the column.
-       NOTE: avoid applying overflow:hidden to every table cell because an optional actions
-       (6th) column may exist; keep overflow rules scoped to the description cell only. */
-    .events-table td:nth-child(2) .event-description {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-    line-clamp: 4;
-    -webkit-line-clamp: 3; /* show ~3 lines in preview */
-        -webkit-box-orient: vertical;
-        white-space: normal;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-    max-height: 5.4rem; /* ~3 lines preview */
-    }
-    .events-table td:nth-child(2) .truncated-text { display: block; white-space: normal; overflow: hidden; text-overflow: ellipsis; }
-    /* If an admin actions column exists (6th column), keep it from wrapping buttons */
-    .events-table th:nth-child(6), .events-table td:nth-child(6) {
-        white-space: nowrap;
-        width: auto;
-    }
-}
-/* Standardize action buttons on desktop to match the register (clock) button sizing */
-@media (min-width: 701px) {
-    /* Apply to action groups across pages (announcements, events, tables, cards) */
-    .action-buttons .btn,
-    .action-buttons .btn-small,
-    .action-buttons .btn-edit,
-    .action-buttons .btn-danger,
-    .expand-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: var(--control-height);
-        padding: 0 1rem;
-        font-size: 1rem;
-        border-radius: 8px;
-        box-sizing: border-box;
-    }
-
-    /* Keep subtle edit buttons low-contrast but same dimensions */
-    .action-buttons .btn-edit { background: transparent; }
-}
-.expand-btn {
-    background: none;
-    border: none;
-    color: var(--accent);
-    cursor: pointer;
-    font-size: 0.9rem;
-    padding: 0;
-}
-.action-buttons { display:flex; gap:0.5rem; align-items:center; }
-.action-buttons .btn-small { padding: 0.35rem 0.6rem; font-size: 0.85rem; }
-
-/* Event form improvements */
-.form-container { max-width: var(--content-max-width); margin: 0 auto; }
-.form-container .inline-controls { display:flex; gap:0.5rem; align-items:center; flex-wrap:nowrap; }
-.form-container .inline-controls .date-input,
-.form-container .inline-controls .time-input {
-    /* Make date and time inputs equal width for a balanced layout */
-    flex: 1 1 0;
-    min-width: 120px;
-    max-width: none;
-    height: calc(var(--control-height) - 6px);
-}
-.form-container .date-input, .form-container .time-input { padding: 0.45rem 0.6rem; border: 1px solid var(--border); border-radius: 8px; height: calc(var(--control-height) - 6px); }
-.form-container .muted-text .btn-small { margin: 0.15rem 0.15rem 0 0; }
-.form-actions { display:flex; gap:0.75rem; justify-content:flex-end; margin-top:1rem; }
-.form-actions .btn-secondary { background: transparent; border:1px solid var(--border); }
 
-/* Make preset time buttons visually distinct and compact */
-.form-container .muted-text button.btn-small { background: color-mix(in srgb, var(--bg-secondary) 88%, transparent); border:1px solid var(--border); }
-
-@media (max-width: 700px) {
-    .events-table .truncated-text { max-width: 220px; }
-    .form-actions { justify-content: stretch; flex-direction: column-reverse; }
-    .form-actions .btn-primary, .form-actions .btn-secondary { width: 100%; }
-    .form-container .inline-controls { flex-wrap: wrap; }
-    .form-container .inline-controls .date-input,
-    .form-container .inline-controls .time-input { flex: 1 1 100%; min-width: 0; }
-}
-
-/* Mobile override: ensure truncated-text for events allows multiline wrapping
-   (some desktop rules set white-space:nowrap; this forces it back to normal
-   on small screens so previews show multiple lines). Scoped to .events-table. */
-@media (max-width: 700px) {
-    .events-table .truncated-text {
-        display: block !important;
-        white-space: normal !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        max-width: none !important;
-    }
-}
-
-/* Improved column alignment for users table */
-.data-table td, .data-table th {
-    vertical-align: middle; /* center cells vertically */
-}
-.data-table td.col-name {
-    text-align: left;
-    /* let name take a comfortable portion but not dominate the row */
-    width: 25%;
-    max-width: 36%;
-    padding-right: 0.35rem; /* bring next column visually closer */
-}
-.data-table td.col-username{
-    /* tighten these small metadata columns so they sit nearer the name */
-    text-align: left;
-    width: 25%;
-    min-width: 96px;
-    white-space: nowrap; /* keep username/role on one line */
-    padding-left: 0.25rem;
-}
-
-.data-table td.col-role {
-    /* tighten these small metadata columns so they sit nearer the name */
-    text-align: left;
-    width: 17%;
-    min-width: 96px;
-    white-space: nowrap; /* keep username/role on one line */
-    padding-left: 0.25rem;
-}
-
-.data-table td.col-actions {
-    text-align: right;
-    white-space: nowrap; /* keep action buttons together */
-    width: 220px; /* reserve enough room for inline buttons on desktop */
-}
-.action-buttons {
-    display: inline-flex;
-    gap: 0.35rem; /* slightly tighter gap so buttons fit side-by-side */
-    align-items: center;
-}
-
-/* Make small action buttons more compact so multiple fit on one line */
-.action-buttons .btn-small {
-    padding: 0.25rem 0.6rem;
-    font-size: 0.92rem;
-    min-height: 34px;
-    border-radius: 7px;
-}
-
-.data-table thead {
-    background: var(--bg-tertiary);
-}
-
-.data-table tbody tr {
-    border-top: 1px solid var(--border);
-}
-
-.data-table tbody tr:hover {
-    background: var(--bg-tertiary);
-}
-
-/* Theme toggle floating button */
-.theme-toggle {
-    position: relative;
-    display: inline-flex;
-    gap: 0.5rem;
-    align-items: center;
-    padding: 0.4rem 0.6rem;
-    border-radius: 999px;
-    font-size: 1rem;
-    border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
-    color: var(--text-primary);
-    cursor: pointer;
-}
-
-.theme-toggle:hover {
-    transform: translateY(-1px);
-}
-
-/* small helper to align inside sidebar */
-.theme-toggle .dot {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    font-size: 1.05rem;
-    line-height: 1;
-    border-radius: 6px;
-    background: transparent;
-}
-
-.sidebar-footer .footer-actions {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    justify-content: flex-start; /* keep buttons inline and to the left so they don't push layout */
-}
-
-.badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.badge-admin {
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
-    color: color-mix(in srgb, var(--accent) 90%, white);
-}
-
-.badge-user {
-    background: color-mix(in srgb, var(--success) 12%, transparent);
-    color: var(--success);
-}
-
-.badge-new {
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
-    color: var(--accent);
-    font-weight: 600;
-}
-
-/* circular variant for 'Novo' in announcements: match .badge-new coloring */
-.badge-circle-new {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
-    color: var(--accent);
-    margin-left: 0.45rem;
-    vertical-align: middle;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
-    font-size: 12px;
-    line-height: 1;
-}
-
-html[data-theme="dark"] .badge-circle-new {
-    /* keep it readable in dark theme; slightly stronger mix */
-    background: color-mix(in srgb, var(--accent) 26%, black 74%);
-    color: var(--accent);
-}
-
-/* Important badge: softer, more pleasant gold - accessible contrast */
-.badge-important {
-    display: inline-block;
-    background: linear-gradient(180deg, #FFF3D6, #FFD580); /* soft warm gradient */
-    color: #2B2B1F; /* dark olive near-black for legibility */
-    padding: 0.16rem 0.5rem;
-    border-radius: 6px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
-    line-height: 1;
-}
-
-/* Dark theme variant: keep it muted and readable */
-html[data-theme="dark"] .badge-important {
-    background: linear-gradient(180deg, #6b4e00, #8a6400);
-    color: #FFFBEA;
-}
-
-/* compact circular badge used beside titles to indicate important items */
-.badge-circle-important {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #FFD54D, #F2B705);
-    margin-left: 0.45rem;
-    vertical-align: middle;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.06);
-    font-size: 12px;
-    line-height: 1;
-    color: #2B2B1F; /* star color */
-}
-
-html[data-theme="dark"] .badge-circle-important {
-    background: linear-gradient(180deg, #E5A800, #C68B00);
-    color: #FFFBEA;
-}
-
-/* Override inline 'background:gold' used in templates for important badges when in dark mode.
-   Inline styles normally win, so use !important here to ensure a darker gold is applied. */
-html[data-theme="dark"] .badge[style*="background:gold"] {
-    background: linear-gradient(180deg, #b57a00 0%, #8a5a00 100%) !important;
-    color: var(--text-primary) !important;
-}
-
-.badge-in {
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
-}
-
-.badge-out {
-    background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* Row container to display small badges side-by-side under titles */
-.badges-row {
-    display: inline-flex;
-    gap: 0.35rem;
-    align-items: center;
-    margin-top: 0.06rem; /* bring badges closer to title */
-}
-
-/* Fix meta position: createdAt/author aligned to the right of the card */
-.announcements-card .item-meta,
-.birthdays-card .item-meta {
-    position: absolute;
-    right: 0.4rem; /* align inside card padding */
-    top: 0.4rem; /* align with title baseline */
-    width: 140px;
-    text-align: right;
-    white-space: nowrap;
-    color: var(--text-secondary);
-}
-
-/* Reduce spacing between createdAt and author (author sits closer) */
-.announcements-card .item-meta .muted-text {
-    margin-top: 0.06rem;
-}
-.announcements-card .item-meta .muted-text + .muted-text {
-    margin-top: 0.02rem; /* very small gap between date and author */
-}
-
-/* Make announcement title slightly smaller so it uses less horizontal space */
-.announcement-title {
-    font-size: 0.98rem;
-}
-
-/* Slightly smaller badge styles within announcement cards */
-.announcements-card .badges-row .badge,
-.birthdays-card .badges-row .badge {
-    font-size: 0.82rem;
-    padding: 0.12rem 0.35rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .layout {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-    }
-    
-    .content-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-}
+/* ============================================================
+   23. PERFIL (sidebar footer)
+   ============================================================ */
 
-/* Profile Edit Section */
 .profile-edit {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     padding: 1.5rem;
     max-width: 600px;
     margin: 2rem auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
-.profile-edit h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    text-align: center;
-}
+/* ============================================================
+   24. ESCALAS
+   ============================================================ */
 
-.profile-edit .form-group {
-    margin-bottom: 1rem;
-}
-
-.profile-edit .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-secondary);
-}
-
-.profile-edit .form-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-}
-
-.profile-edit .form-group input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-}
-
-.profile-edit .form-actions {
-    display: flex;
-    justify-content: space-between;
+.schedules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1rem;
 }
 
-.profile-edit .form-actions button {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.schedule-add-form {
+    display: flex;
+    gap: .5rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.schedule-field-wide { flex: 1; min-width: 200px; }
+.schedules-existing { margin-top: 1rem; }
+
+/* ============================================================
+   25. INDICADOR DE PROGRESSO (formulário de intenção)
+   ============================================================ */
+
+.form-steps-progress {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+.progress-track {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
     background: var(--accent);
-    color: white;
-    font-size: 1rem;
+    border-radius: 8px;
+    transition: width 300ms ease;
+    width: 0%;
 }
+#stepIndicator { font-size: .9rem; color: var(--text-secondary); white-space: nowrap; }
 
-.profile-edit .form-actions button:hover {
-    background: var(--accent-hover);
-}
+/* ============================================================
+   26. RESPONSIVO
+   ============================================================ */
 
-/* Mobile tweaks: make all top report cards behave like "Horas Trabalhadas" on small screens
-   and adjust the sidebar toggle so it doesn't obscure page content. Desktop rules unchanged. */
-@media (max-width: 700px) {
-    /* Ensure all top-cards use a compact stacked layout (same as Hours card) */
-    .top-cards > .form-container {
-        padding: 0.9rem;
-        gap: 0.75rem;
-        min-height: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
+/* ── Tablets e mobile (≤ 900px) ── */
+@media (max-width: 900px) {
+
+    /* --- sidebar off-canvas --- */
+    .sidebar-toggle { display: inline-flex; }
+
+    .sidebar {
+        position: fixed;
+        left: 0; top: 0; bottom: 0;
+        transform: translateX(-110%);
+        transition: transform 220ms ease;
+        z-index: 1100;
+        width: min(80vw, 320px);
+        max-width: 320px;
+        box-shadow: var(--shadow-lg);
+    }
+    body.sidebar-open .sidebar { transform: translateX(0); }
+
+    /* overlay escuro quando sidebar aberta */
+    body.sidebar-open::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.28);
+        z-index: 1050;
     }
 
-    .top-cards > .form-container .card-row {
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: stretch;
-    }
-
-    .top-cards > .form-container .card-row .control {
+    /* layout vira block para main-content ocupar tudo */
+    .layout { display: block; }
+    .main-content {
+        padding: 1rem;
+        padding-top: 3.5rem; /* espaço para o toggle fixo */
+        margin-left: 0;
         width: 100%;
-        max-width: none;
     }
 
-    /* Make date inputs fill their column on mobile (they were constrained by min-width earlier) */
-    .top-cards > .form-container .date-row input[type="date"],
-    .top-cards > .form-container .date-row .control[type="date"],
-    .top-cards > .form-container .date-row input[type="date"].control {
-        min-width: 0 !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Ensure date inputs keep the standard control height and padding like the Hours card */
-    .top-cards > .form-container .date-row input[type="date"],
-    .top-cards > .form-container .date-row .control[type="date"],
-    .top-cards > .form-container .date-row input[type="date"].control {
-        height: var(--control-height) !important;
-        min-height: var(--control-height) !important;
-        padding: 0 0.75rem !important;
-        font-size: 1rem !important;
-        border-radius: 8px !important;
-    }
-
-    /* Keep label text and date input inline (like Hours) so inputs look identical */
-    .top-cards > .form-container .date-row label {
-        display: flex !important;
-        gap: 0.5rem !important;
-        align-items: center !important;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    /* Make actions stack and be full-width like the Hours card on mobile */
-    .top-cards > .form-container .card-actions {
-        margin-top: 0.5rem;
-        display: flex;
-        flex-direction: column-reverse;
-        gap: 0.75rem;
-        align-items: stretch;
-        justify-content: flex-start;
-    }
-
-    .top-cards > .form-container .card-actions .btn-primary,
-    .top-cards > .form-container .card-actions .btn-secondary,
-    .top-cards > .form-container .card-actions .export-dropdown {
-        width: 100%;
-        min-width: 0;
-    }
-
-    /* Keep the activity-report card actions inline (it is full-width) */
-    .top-cards > .form-container.activity-report .card-actions {
-        margin-top: 0.5rem;
-        /* stack buttons vertically on mobile to match Hours card behavior */
-        flex-direction: column-reverse;
-        justify-content: flex-start;
-        gap: 0.5rem;
-        align-items: center;
-    }
-
-    /* Move header a bit down so the fixed toggle doesn't overlap the title */
-    .content-header { margin-top: 2.5rem; position: relative; z-index: 1100; transition: opacity 180ms ease, transform 180ms ease; }
-    .content-header h1 { margin-top: 0.25rem; }
-
-    /* When the sidebar is open on small screens, hide/fade the header so it doesn't show over the nav */
-    @media (max-width: 900px) {
-        body.sidebar-open .content-header {
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transform: translateY(-6px) !important;
-        }
-    }
-
-    /* Make sidebar toggle less intrusive: slightly lower and give stronger background + shadow */
-    .sidebar-toggle {
-        top: 22px;
-        left: 12px;
-        background: color-mix(in srgb, var(--bg-secondary) 92%, black 8%);
-        box-shadow: 0 8px 26px rgba(2,6,23,0.18);
-        border: 1px solid color-mix(in srgb, var(--border) 80%, black 6%);
-        padding: 0.5rem 0.65rem;
-        opacity: 1;
-        color: var(--text-primary);
-    }
-
-    /* Slightly reduce overlay darkness when sidebar is open so underlying content remains legible */
-    body.sidebar-open::after { background: rgba(0,0,0,0.22); }
-}
-
-/* Stronger mobile overrides to beat earlier media-query rules and inline styles */
-@media (max-width: 700px) {
-    /* Ensure sidebar toggle appears above the sidebar content when open and visually matches sidebar background */
-    .sidebar-toggle {
-        z-index: 1160 !important; /* sit above the sidebar so the X is visible */
-    }
-
-    /* When sidebar opens, place the toggle near the sidebar edge, match nav background and keep it lower to give distance from the title */
+    /* toggle aparece acima do conteúdo */
+    .sidebar-toggle { display: inline-flex; }
     body.sidebar-open .sidebar-toggle {
-        left: calc(min(80vw, 320px) - 56px) !important;
-        top: 30px !important; /* more distance from title */
-        background: #ffffff !important; /* white button */
-        color: var(--text-primary) !important; /* ensure icon/text is readable */
-        box-shadow: none !important; /* remove shadow/contour */
-        border: none !important; /* remove outline when nav is open */
-        padding: 0.5rem 0.65rem !important;
-        opacity: 1 !important;
-        z-index: 1160 !important;
+        left: calc(min(80vw, 320px) - 52px);
+        top: 16px;
+        z-index: 1150;
+        background: var(--bg-secondary);
     }
 
-    /* When opening/closing, nudge slightly for a smoother feel */
-    body.sidebar-open .sidebar-toggle { transform: translateY(-2px) scale(1); }
-    body:not(.sidebar-open) .sidebar-toggle { transform: translateY(0) scale(1); }
-
-    /* Make sure hover / focus / active states also remove contours on open nav */
-    body.sidebar-open .sidebar-toggle:hover,
-    body.sidebar-open .sidebar-toggle:focus,
-    body.sidebar-open .sidebar-toggle:active {
-        background: #ffffff !important;
-        color: var(--text-primary) !important;
-        border: none !important;
-        box-shadow: none !important;
-        outline: none !important;
+    /* overlay fecha sidebar ao clicar fora */
+    body.sidebar-open .content-header {
+        opacity: .4;
+        pointer-events: none;
     }
 
-    /* Remove any inline margin-left from the activity-report card-actions that pushed buttons away on small screens */
-    .top-cards > .form-container.activity-report .card-actions {
-        margin-left: 0 !important;
-        margin-top: 0.5rem !important;
-        align-self: stretch !important;
-        justify-content: flex-start !important;
-        gap: 0.5rem !important;
+    /* header vira coluna */
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .75rem;
     }
+    .content-header .header-actions { width: 100%; }
 
-    /* Ensure card-actions inside any top-card won't be pushed off-screen by stray inline styles */
-    .top-cards > .form-container .card-actions {
-        width: 100% !important;
-        box-sizing: border-box !important;
-        padding: 0 !important;
+    /* tabelas com scroll horizontal */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
+    .data-table { min-width: 560px; }
+
+    /* formulários ocupam 100% */
+    .form-container { max-width: 100%; }
+    .form-container.wide { width: 100%; max-width: 100%; }
+    .form-container.wide.profile-wide { width: 100%; max-width: 100%; padding: 1.25rem; }
+
+    .form-actions { flex-direction: column-reverse; gap: .6rem; }
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary,
+    .form-actions .btn-danger { width: 100%; }
+
+    /* cards de ação rápida empilham */
+    .activity-cards { grid-template-columns: repeat(2, 1fr); }
+    .top-cards { grid-template-columns: 1fr; }
+
+    .export-dropdown { width: 100%; }
+    .export-dropdown .export-toggle { width: 100%; justify-content: center; }
+    .export-dropdown .export-menu { right: 0; left: 0; min-width: auto; }
+
+    .stats-grid { grid-template-columns: 1fr 1fr; }
 }
 
-/* Quick fix: force announcement/event expand controls to render horizontally
-   in all contexts so 'Ver mais' does not stack letters vertically. This
-   overrides any cascade that inadvertently narrows the inline box or allows
-   wrapping between characters. Keeps mobile full-width behavior intact. */
-.announcement-message .expand-btn,
-.announcements-table .expand-btn,
-.events-table .expand-btn,
-.announcements-card .expand-btn,
-.announcement-message .expand-link {
-    display: inline-flex !important;
-    align-items: baseline !important;
-    white-space: nowrap !important; /* prevent breaking between characters */
-    writing-mode: horizontal-tb !important; /* force horizontal text flow */
-    flex-shrink: 0 !important; /* avoid compressing into a very narrow column */
-    padding: 0.12rem 0.35rem !important;
-    margin: 0 0 0 -0.45rem !important; /* keep it close to the ellipsis */
-    text-decoration: none !important;
-    overflow: visible !important;
-}
-
-/* If any rule forces word-break or overflow-wrap on inline controls, undo it here */
-.announcement-message .expand-btn { word-break: normal !important; overflow-wrap: normal !important; }
-
+/* ── Mobile pequeno (≤ 700px) ── */
 @media (max-width: 700px) {
-    /* On mobile we still want the expand control to be an easy tap target */
-    .announcement-message .expand-btn,
-    .announcements-table .expand-btn,
-    .events-table .expand-btn {
+    body { font-size: 15px; }
+
+    .main-content { padding: 1rem; padding-top: 3.5rem; }
+
+    .stats-grid { grid-template-columns: 1fr; }
+    .activity-cards { grid-template-columns: 1fr; }
+    .actions-grid { grid-template-columns: 1fr; }
+
+    /* tabelas viram cards empilhados */
+    .announcements-table,
+    .events-table { border: none; min-width: 0 !important; }
+
+    .announcements-table thead,
+    .events-table thead { display: none; }
+
+    .announcements-table tbody tr,
+    .events-table tbody tr {
+        display: block;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        margin-bottom: .9rem;
+        box-shadow: var(--shadow-sm);
+    }
+    .announcements-table tbody td,
+    .events-table tbody td {
+        display: block;
+        width: 100%;
+        padding: .3rem .5rem;
+        overflow: visible;
+    }
+
+    /* mensagem de anúncio vira coluna no mobile */
+    .announcement-message {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: .35rem !important;
+    }
+    .expand-btn {
         display: block !important;
         width: 100% !important;
+        text-align: left !important;
+        margin: .3rem 0 0 0 !important;
+        padding: .4rem 0 !important;
+        font-size: .95rem !important;
+    }
+    .truncated-box { padding-right: 0; }
+
+    /* botões de ação nos cards mobile — lado a lado */
+    .announcements-table tbody td .action-buttons,
+    .events-table tbody td .action-buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        gap: .5rem !important;
+        justify-content: flex-end !important;
+        margin-top: .6rem;
+    }
+
+    /* atividades rápidas empilham */
+    .quick-activities-row {
+        flex-direction: column;
+        overflow: visible;
+    }
+    .quick-activity-card {
+        min-width: 0;
+        width: 100%;
+    }
+
+    /* meta de card fica abaixo do título no mobile */
+    .item-meta {
+        position: static !important;
+        right: auto !important; top: auto !important;
+        width: auto !important;
+        text-align: left !important;
         white-space: normal !important;
-        text-align: left !important;
-        padding: 0.4rem 0 !important;
-        margin: 0.35rem 0 0 0 !important;
+    }
+    .mobile-created { display: inline !important; margin-left: .4rem; }
+
+    /* disponibilidade em formulário */
+    .availability-grid { grid-template-columns: 1fr; }
+    .availability-grid-header { display: none; }
+    .availability-row { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    .availability-row > div:first-child { grid-column: 1 / -1; }
+
+    /* inline-controls empilham */
+    .inline-controls { flex-direction: column; }
+    .narrow { width: 100%; flex: none; }
+
+    /* filtro */
+    .filter-form { gap: .5rem; }
+    .filter-form .search-input { flex-basis: 100%; min-width: 0; }
+    .filter-form .date-input { flex: 0 0 48%; min-width: 0; }
+    .type-filter-group { flex-wrap: wrap; }
+    .type-filter-group .entry-type-select { flex: 1 1 auto; }
+
+    /* formulário de intenção: toggle invisível */
+    body.hide-toggle-on-mobile .sidebar-toggle { display: none; }
+
+    /* card footer de atividade — inline no mobile */
+    .card-footer,
+    .activity-card-actions {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: .5rem !important;
+        justify-content: flex-end !important;
+    }
+    .card-footer .btn-small,
+    .card-footer .btn-edit,
+    .card-footer .btn-danger,
+    .activity-card-actions .btn-small,
+    .activity-card-actions .btn-danger {
+        display: inline-flex !important;
+        width: auto !important;
+        padding: .35rem .75rem !important;
+    }
+
+    .form-actions { justify-content: stretch; }
+}
+
+/* ── Mobile muito pequeno (≤ 480px) ── */
+@media (max-width: 480px) {
+    .sidebar-toggle { left: 8px; top: 8px; }
+    .main-content { padding: .875rem; padding-top: 3.2rem; }
+    .stat-value { font-size: 1.6rem; }
+    .login-box { padding: 1.75rem 1.25rem; }
+}
+
+/* ── Desktop: dois cards no topo lado a lado ── */
+@media (min-width: 900px) {
+    .top-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+    .top-cards > .form-container.activity-report {
+        grid-column: 1 / -1;
     }
 }
 
-/* PARITY: make Events and Dashboard "Ver mais" match Announcements style */
-/* Copy the link-like inline appearance used for announcements on desktop,
-   and the full-width tappable variant on mobile. High specificity + !important
-   helps override older duplicated rules elsewhere. */
-.events-table td:nth-child(2) .announcement-message .expand-btn,
-.events-table .expand-btn,
-.top-cards .expand-btn,
-.events-card .expand-btn,
-.compact-list .announcement-message .expand-btn {
-    /* match announcements small-button visual: rounded, bordered, subtle */
-    display: inline-block !important;
-    margin: 0.5rem auto 0 auto !important;
-    padding: 0.45rem 0.9rem !important;
-    background: transparent !important;
-    color: var(--text-secondary) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
-    text-decoration: none !important;
-    font-weight: 400 !important;
-    font-size: 0.95rem !important;
-    box-sizing: border-box !important;
+/* ── Desktop largo: filtro em linha única ── */
+@media (min-width: 1100px) {
+    .filter-form { flex-wrap: nowrap; }
+    .filter-form .search-input { flex: 1 1 350px; min-width: 250px; }
+    .type-filter-group { flex: 0 0 auto; }
 }
-
-@media (max-width: 700px) {
-    .events-table td:nth-child(2) .announcement-message .expand-btn,
-    .events-table .expand-btn,
-    .top-cards .expand-btn,
-    .events-card .expand-btn,
-    .compact-list .announcement-message .expand-btn {
-        display: block !important;
-        width: 100% !important;
-        margin: 0.35rem 0 0 0 !important;
-        text-align: left !important;
-        padding: 0.35rem 0 !important;
-    }
-}
-
-

@@ -34,7 +34,7 @@
                             <option value="outro">Outro</option>
                         {% endif %}
                     </select>
-                    <input id="attendance_type_custom" name="attendance_type_custom" class="control" placeholder="Especifique outro tipo" style="margin-top:0.5rem; display:none;" />
+                    <input id="attendance_type_custom" name="attendance_type_custom" class="control" placeholder="Especifique outro tipo" class="field-conditional" style="display:none;" />
                 </div>
 
                 <div class="form-group">
@@ -47,7 +47,7 @@
                         <option value="UTI 4">UTI 4</option>
                         <option value="Outro">Outro</option>
                     </select>
-                    <input id="unit_scope_custom" name="unit_scope_custom" class="control" placeholder="Especifique a unidade" style="margin-top:0.5rem; display:none;" />
+                    <input id="unit_scope_custom" name="unit_scope_custom" class="control" placeholder="Especifique a unidade" class="field-conditional" style="display:none;" />
                 </div>
 
                 <div class="form-group">
@@ -59,14 +59,14 @@
                 <div class="form-group">
                     <label for="count">Número de atendimentos realizados (hoje)</label>
                     <input id="count" name="count" type="number" min="1" value="1" class="control" />
-                    <div class="muted-text" style="margin-top:0.35rem;">Você já registrou <strong>{{ today_count }}</strong> vez(es) hoje; ao salvar serão adicionadas as quantidades informadas.</div>
+                    <div class="muted-text">Você já registrou <strong>{{ today_count }}</strong> vez(es) hoje; ao salvar serão adicionadas as quantidades informadas.</div>
                 </div>
                 {% else %}
                 <div class="muted-text">Observe: esta atividade não permite marcações múltiplas por dia; o registro será contado como 1 ocorrência.</div>
                 {% endif %}
 
                 <div class="form-actions">
-                    <a href="{{ url_for('activities') }}" class="btn-secondary">Cancelar</a>
+                    <a href="{{ url_for('activities.activities') }}" class="btn-secondary">Cancelar</a>
                     <button type="submit" class="btn-primary">Salvar registro</button>
                 </div>
             </form>

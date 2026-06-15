@@ -797,6 +797,10 @@
                     confirmBackdrop.addEventListener('click', function(e){ if (e.target === confirmBackdrop) closeConfirm(); });
                     // escape to close
                     document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeConfirm(); });
+
+                    // expose globally so inline onclick="closeConfirmModal()" in templates also works
+                    window.closeConfirmModal = closeConfirm;
+                    window.closeConfirm = closeConfirm;
                 } catch (e){ console.error('initConfirmActions error', e); }
             })();
 

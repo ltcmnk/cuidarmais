@@ -6,7 +6,7 @@
 <div class="layout">
     {% include '_sidebar.html' %}
 
-    <main class="main-content">
+    <main id="main-content" class="main-content">
         <header class="content-header">
             <div>
                 <h1>Eventos</h1>
@@ -22,77 +22,74 @@
             <table class="data-table events-table">
                 <thead>
                     <tr>
-                        <th>Título</th>
-                        <th>Descrição</th>
-                        <th>Detalhes</th>
+                        <th scope="col">Título</th>
+                        <th scope="col">Descrição</th>
+                        <th scope="col">Detalhes</th>
                         {% if current_user_role == 'admin' %}
-                        <th>Ações</th>
+                        <th scope="col">Ações</th>
                         {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for e in events %}
-                        <tr data-ev-id="{{ e.id }}">
-                            <td>
-                                {% if e.title|length > 50 %}
-                                <strong class="truncated-text" id="title-{{ e.id }}">{{ e.title[:50] }}</strong>
-                                <strong class="full-text" id="full-title-{{ e.id }}">{{ e.title }}</strong>
-                                {% else %}
-                                <strong>{{ e.title }}</strong>
-                                {% endif %}
-                                <div class="badges-row">
-                                    {% if e.important %}
-                                        <span class="badge-circle-important" title="Importante" aria-hidden="true">★</span>
-                                        <span class="sr-only">Evento marcado como importante</span>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td class="muted-text">
-                                <div class="announcement-message" id="event-msg-{{ e.id }}">
-                                    {# If description is long, show truncated preview + full text and a "Ver mais" control; otherwise render full description inline. #}
-                                    {% if e.description and e.description|length > 255 %}
-                                        <div class="truncated-box" id="truncated-{{ e.id }}">{{ e.description[:255] }}</div>
-                                        <div class="full-text" id="full-{{ e.id }}" aria-hidden="true">{{ e.description }}</div>
-                                        <button type="button" class="expand-btn" data-target="event-msg-{{ e.id }}" aria-controls="full-{{ e.id }}" aria-expanded="false">Ver mais</button>
-                                    {% else %}
-                                        <div class="full-text" id="full-{{ e.id }}">{{ e.description }}</div>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td class="event-meta muted-text">
-                                {% if e.scheduled_at %}
-                                    {{ e.scheduled_at|shortdate }}
-                                    {% if e.scheduled_end and 'T' in e.scheduled_end %}
-                                        <div class="muted-text">até {{ e.scheduled_end|timeonly }}</div>
-                                    {% endif %}
-                                {% elif e.date %}
-                                    {{ e.date|shortdate }}
-                                {% endif %}
-                                {% if e.location %}
-                                    <div class="muted-text">{{ e.location }}</div>
-                                {% endif %}
-                            </td>
-                            {% if current_user_role == 'admin' %}
-                            <td>
-                                <div class="action-buttons">
-                                    <form method="GET" action="{{ url_for('events.edit_event', ev_id=e.id) }}" style="display:inline;">
-                                        <button type="submit" class="btn-small btn-edit">Editar</button>
-                                    </form>
-                                    <form method="POST" action="{{ url_for('events.delete_event', ev_id=e.id) }}" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este evento?');">
-                                        <button type="submit" class="btn-small btn-danger">Excluir</button>
-                                    </form>
-                                </div>
-                            </td>
+                    <tr data-ev-id="{{ e.id }}">
+                        <td>
+                            {% if e.title|length > 50 %}
+                            <strong class="truncated-text" id="title-{{ e.id }}">{{ e.title[:50] }}</strong>
+                            <strong class="full-text" id="full-title-{{ e.id }}">{{ e.title }}</strong>
+                            {% else %}
+                            <strong>{{ e.title }}</strong>
                             {% endif %}
-                        </tr>
+                            <div class="badges-row">
+                                {% if e.important %}
+                                    <span class="badge-circle-important" title="Importante" aria-hidden="true">★</span>
+                                    <span class="sr-only">Evento marcado como importante</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="muted-text">
+                            <div class="announcement-message" id="event-msg-{{ e.id }}">
+                                {% if e.description and e.description|length > 255 %}
+                                    <div class="truncated-box" id="truncated-{{ e.id }}">{{ e.description[:255] }}</div>
+                                    <div class="full-text" id="full-{{ e.id }}" aria-hidden="true">{{ e.description }}</div>
+                                    <button type="button" class="expand-btn" data-target="event-msg-{{ e.id }}" aria-controls="full-{{ e.id }}" aria-expanded="false">Ver mais</button>
+                                {% else %}
+                                    <div class="full-text" id="full-{{ e.id }}">{{ e.description }}</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="event-meta muted-text">
+                            {% if e.scheduled_at %}
+                                {{ e.scheduled_at|shortdate }}
+                                {% if e.scheduled_end and 'T' in e.scheduled_end %}
+                                    <div class="muted-text">até {{ e.scheduled_end|timeonly }}</div>
+                                {% endif %}
+                            {% elif e.date %}
+                                {{ e.date|shortdate }}
+                            {% endif %}
+                            {% if e.location %}
+                                <div class="muted-text">{{ e.location }}</div>
+                            {% endif %}
+                        </td>
+                        {% if current_user_role == 'admin' %}
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('events.edit_event', ev_id=e.id) }}" class="btn-small btn-edit">Editar</a>
+                                <form method="POST" action="{{ url_for('events.delete_event', ev_id=e.id) }}" class="confirm-action" data-confirm-message="Tem certeza que deseja excluir este evento?">
+                                    <button type="submit" class="btn-small btn-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% else %}
-            <div class="empty-state" style="padding:1.25rem;">
+            <div class="empty-state">
                 <p>Não há eventos publicados.</p>
-                    {% if current_user_role == 'admin' %}
-                <div style="margin-top:1rem;">
+                {% if current_user_role == 'admin' %}
+                <div class="empty-state-action">
                     <a href="{{ url_for('events.add_event') }}" class="btn-primary">+ Adicionar Evento</a>
                 </div>
                 {% endif %}
@@ -102,5 +99,3 @@
     </main>
 </div>
 {% endblock %}
-
-{% block scripts %}{% endblock %}

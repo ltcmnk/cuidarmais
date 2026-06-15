@@ -6,17 +6,17 @@
 
         <div class="center-container">
             <div class="center-inner">
-                <header class="content-header" style="flex-direction:column; align-items:center; text-align:center; margin-bottom:0.5rem;">
-                        <h1>Quero ser Voluntário</h1>
-                        <p class="subtitle">Preencha o formulário em 3 etapas — leva só alguns minutos</p>
+                <header class="content-header intention-header">
+                    <h1>Quero ser Voluntário</h1>
+                    <p class="subtitle">Preencha o formulário em 3 etapas — leva só alguns minutos</p>
                 </header>
                 <div class="form-container wide">
-                    <form id="intentionForm" method="POST" action="{{ url_for('submit_intention') }}" novalidate>
+                    <form id="intentionForm" method="POST" action="{{ url_for('intents.submit_intention') }}" novalidate>
 
-            <div class="form-steps-progress" style="margin-bottom:1rem; display:flex; gap:0.5rem; align-items:center;">
+            <div class="form-steps-progress">
                 <div id="stepIndicator" aria-hidden="true">Etapa <span id="currentStep">1</span> / 3</div>
-                <div style="flex:1; height:8px; background:var(--bg-tertiary); border-radius:8px; overflow:hidden;">
-                    <div id="progressBar" style="height:8px; width:0%; background:var(--accent);"></div>
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-bar"></div>
                 </div>
             </div>
 
@@ -198,7 +198,7 @@
                     <input id="ficou_sab" name="ficou_sab" class="control">
                 </div>
 
-                <div class="step-actions" style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;">
+                <div class="step-actions">
                     <button type="button" class="btn-secondary" id="nextBtn1">Próximo</button>
                 </div>
             </section>
@@ -212,7 +212,7 @@
                         <label><input type="radio" name="ja_volunt_radio" value="no" checked> Não</label>
                         <label><input type="radio" name="ja_volunt_radio" value="yes"> Sim</label>
                     </div>
-                    <div id="ja_volunt_onde_group" class="form-group conditional-hidden" style="margin-top:0.5rem;">
+                    <div id="ja_volunt_onde_group" class="form-group conditional-hidden">
                         <input id="ja_volunt_onde" name="ja_volunt_onde" class="control" disabled placeholder="Onde?">
                     </div>
                 </div>
@@ -233,7 +233,7 @@
                         <label><input type="radio" name="hab_musical_radio" value="no" checked> Não</label>
                         <label><input type="radio" name="hab_musical_radio" value="yes"> Sim</label>
                     </div>
-                    <div id="hab_musical_qual_group" class="form-group conditional-hidden" style="margin-top:0.5rem;">
+                    <div id="hab_musical_qual_group" class="form-group conditional-hidden">
                         <input id="hab_musical_qual" name="hab_musical_qual" class="control" disabled placeholder="Qual?">
                     </div>
                 </div>
@@ -246,7 +246,7 @@
                     </div>
                 </div>
 
-                <div class="step-actions" style="display:flex; justify-content:space-between; gap:0.5rem; margin-top:1rem;">
+                <div class="step-actions step-actions--split">
                     <button type="button" class="btn-secondary" id="prevBtn2">Anterior</button>
                     <button type="button" class="btn-secondary" id="nextBtn2">Próximo</button>
                 </div>
@@ -281,7 +281,7 @@
                     </div>
                 </div>
 
-                <div class="step-actions" style="display:flex; justify-content:space-between; gap:0.5rem; margin-top:1rem;">
+                <div class="step-actions step-actions--split">
                     <button type="button" class="btn-secondary" id="prevBtn3">Anterior</button>
                     <button type="submit" class="btn-primary" id="submitBtn">Enviar inscrição</button>
                 </div>
